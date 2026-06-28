@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Download, Copy, Link, X, Info } from 'lucide-react';
+import { Download, Copy, Link, Info } from 'lucide-react';
 import type { VFSNode } from '../../core/vfs/types';
 import { readFileBlob } from '../../core/vfs/ZipVFS';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Download, AlertCircle } from 'lucide-react';
 import type { VFSFile } from '../../core/vfs/types';
 import { readFileBlob } from '../../core/vfs/ZipVFS';

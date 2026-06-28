@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { ChevronRight, Loader2, X } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import type { VFSNode, VFSFile, VFSZipFile, VFSFolder } from '../../core/vfs/types';
 import { FileIcon } from './FileIcon';
 import { ContextMenu } from './ContextMenu';

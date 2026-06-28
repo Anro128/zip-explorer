@@ -23,7 +23,7 @@ interface SettingsState {
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       theme: 'dark',
       explorerWidth: 280,
       sort: { field: 'name', order: 'asc' },

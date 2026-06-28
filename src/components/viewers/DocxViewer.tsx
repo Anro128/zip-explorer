@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import * as mammoth from 'mammoth';
 import type { VFSFile } from '../../core/vfs/types';
 
@@ -10,7 +10,7 @@ interface DocxViewerProps {
 export function DocxViewer({ file, bytes }: DocxViewerProps) {
   const [html, setHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -18,7 +18,7 @@ export function DocxViewer({ file, bytes }: DocxViewerProps) {
     async function parseDocx() {
       try {
         const result = await mammoth.convertToHtml(
-          { arrayBuffer: bytes.buffer },
+          { arrayBuffer: bytes.buffer as ArrayBuffer },
           { includeDefaultStyleMap: true }
         );
         if (cancelled) return;

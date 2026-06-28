@@ -9,9 +9,6 @@
 import {
   ZipReader,
   BlobReader,
-  Uint8ArrayReader,
-  BlobWriter,
-  TextWriter,
   Uint8ArrayWriter,
   type Entry,
 } from '@zip.js/zip.js';
@@ -85,7 +82,7 @@ export async function openNestedZip(
   const zipId = newZipId(name);
   _nestedZipBytes.set(zipId, bytes);
 
-  const blob = new Blob([bytes]);
+  const blob = new Blob([bytes as unknown as BlobPart]);
   const reader = new ZipReader(new BlobReader(blob), {
     password,
     useWebWorkers: true,
@@ -244,7 +241,7 @@ export async function readFileBytes(
   if (!entry) throw new Error(`Entry not found: ${entryPath} in ${zipId}`);
 
   const writer = new Uint8ArrayWriter();
-  const bytes = await entry.getData!(writer, {
+  const bytes = await (entry as any).getData!(writer, {
     password: password ?? _contexts.get(zipId)?.password,
   });
 
@@ -274,7 +271,7 @@ export async function readFileBlob(
   password?: string
 ): Promise<Blob> {
   const bytes = await readFileBytes(zipId, entryPath, password);
-  return new Blob([bytes], { type: mimeType });
+  return new Blob([bytes as unknown as BlobPart], { type: mimeType });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

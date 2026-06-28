@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, FileText } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useExplorerStore } from '../../store/useExplorerStore';
 import { usePreviewStore } from '../../store/usePreviewStore';
 import { flattenNodes } from '../../core/vfs/ZipVFS';

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { X, Command, Search, File, XCircle } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { X, Command, Search, XCircle } from 'lucide-react';
 
 interface ShortcutsDialogProps {
   onClose: () => void;

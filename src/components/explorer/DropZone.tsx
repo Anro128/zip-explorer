@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useZipLoader } from '../../hooks/useZipLoader';
-import { Upload, FolderOpen } from 'lucide-react';
+import { FolderOpen } from 'lucide-react';
 
 export function DropZone() {
   const [isDragging, setIsDragging] = useState(false);

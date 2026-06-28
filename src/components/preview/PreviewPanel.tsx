@@ -1,4 +1,3 @@
-import React from 'react';
 import { TabBar } from './TabBar';
 import { ViewerRouter } from './ViewerRouter';
 import { usePreviewStore } from '../../store/usePreviewStore';

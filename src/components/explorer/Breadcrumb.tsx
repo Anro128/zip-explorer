@@ -15,7 +15,7 @@ export function Breadcrumb({ items, onNavigate }: BreadcrumbProps) {
       <span className="breadcrumb-item" onClick={() => onNavigate({ label: 'Home', path: '', nodeKind: 'root' })}>
         <Home size={11} />
       </span>
-      {items.map((item, idx) => (
+      {items.map((item, _idx) => (
         <React.Fragment key={item.path}>
           <span className="breadcrumb-separator">
             <ChevronRight size={10} />

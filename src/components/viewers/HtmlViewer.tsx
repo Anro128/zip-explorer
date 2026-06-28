@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 interface HtmlViewerProps {
   text: string;

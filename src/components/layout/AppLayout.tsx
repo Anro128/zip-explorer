@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Header } from './Header';
 import { SplitPanel } from './SplitPanel';
 import { useExplorerStore } from '../../store/useExplorerStore';
@@ -15,8 +15,7 @@ function StatusBar() {
   const { rootZips, searchQuery, searchResults } = useExplorerStore();
   const { tabs } = usePreviewStore();
 
-  const totalFiles = rootZips.reduce((sum, rz) => sum + rz.nodes.length, 0);
-
+  
   return (
     <div className="status-bar" id="status-bar">
       <span className="status-item">
@@ -44,8 +43,7 @@ export function AppLayout() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   useTheme(); // Apply theme to document
 
-  const { setSearchQuery } = useExplorerStore();
-  const { closeTab, activeTabId } = usePreviewStore();
+    const { closeTab, activeTabId } = usePreviewStore();
 
   const handlers = {
     onQuickOpen: useCallback(() => setShowQuickOpen(true), []),

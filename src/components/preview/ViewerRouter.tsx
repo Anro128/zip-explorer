@@ -1,4 +1,3 @@
-import React, { Suspense } from 'react';
 import type { VFSFile } from '../../core/vfs/types';
 import { useFileContent } from '../../hooks/useFileContent';
 import { PdfViewer } from '../viewers/PdfViewer';

@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { useState, useMemo } from 'react';
 import { MAX_JSON_COLLAPSE_DEPTH } from '../../utils/constants';
 
 interface JsonNodeProps {

@@ -44,7 +44,7 @@ export function useFileContent(file: VFSFile | null): UseFileContentResult {
           if (cancelled) return;
           // Revoke previous URL
           if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
-          const blob = new Blob([bytes], { type: file.mimeType });
+          const blob = new Blob([bytes as unknown as BlobPart], { type: file.mimeType });
           const url = URL.createObjectURL(blob);
           prevUrlRef.current = url;
           setState({ text: null, bytes, blobUrl: url, isLoading: false, error: null });

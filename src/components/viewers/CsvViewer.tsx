@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { Search, Filter } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Search } from 'lucide-react';
 
 interface CsvViewerProps {
   text: string;

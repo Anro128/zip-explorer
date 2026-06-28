@@ -1,4 +1,4 @@
-import React, { useMemo, Suspense } from 'react';
+import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -7,7 +7,7 @@ import 'katex/dist/katex.min.css';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import python from 'react-syntax-highlighter/dist/esm/languages/hljs/python';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { useSettingsStore } from '../../store/useSettingsStore';
+
 
 SyntaxHighlighter.registerLanguage('python', python);
 
@@ -155,10 +155,9 @@ function CellOutput({ output }: { output: Output }) {
   return null;
 }
 
-function CodeCell({ cell, index, language }: { cell: Cell; index: number; language: string }) {
+function CodeCell({ cell, language }: { cell: Cell; language: string }) {
   const source = getCellSource(cell.source);
-  const { theme } = useSettingsStore();
-
+  
   return (
     <div className="nb-cell nb-cell-code">
       <div className="nb-input-prompt">
@@ -263,7 +262,7 @@ export function NotebookViewer({ text }: NotebookViewerProps) {
       {/* Cells */}
       {parsed.cells.map((cell, idx) => {
         if (cell.cell_type === 'code') {
-          return <CodeCell key={idx} cell={cell} index={idx} language={language} />;
+          return <CodeCell key={idx} cell={cell} language={language} />;
         }
         if (cell.cell_type === 'markdown') {
           return <MarkdownCell key={idx} cell={cell} />;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ZoomIn, ZoomOut, RotateCcw, Download } from 'lucide-react';
 import type { VFSFile } from '../../core/vfs/types';
 import { readFileBlob } from '../../core/vfs/ZipVFS';
@@ -10,8 +10,7 @@ interface ImageViewerProps {
 
 export function ImageViewer({ file, blobUrl }: ImageViewerProps) {
   const [zoom, setZoom] = useState(1);
-  const [rotation, setRotation] = useState(0);
-
+  
   const download = async () => {
     const blob = await readFileBlob(file.zipId, file.entryPath, file.mimeType);
     const url = URL.createObjectURL(blob);
@@ -50,7 +49,7 @@ export function ImageViewer({ file, blobUrl }: ImageViewerProps) {
           src={blobUrl}
           alt={file.name}
           style={{
-            transform: `scale(${zoom}) rotate(${rotation}deg)`,
+            transform: `scale(${zoom})`,
             transition: 'transform 200ms ease',
             maxWidth: zoom > 1 ? 'none' : '100%',
             maxHeight: zoom > 1 ? 'none' : '100%',

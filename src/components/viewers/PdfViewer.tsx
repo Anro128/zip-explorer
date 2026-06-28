@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, RotateCcw } from 'lucide-react';
 import type { VFSFile } from '../../core/vfs/types';
 import { PDF_INITIAL_SCALE } from '../../utils/constants';
@@ -48,7 +48,7 @@ function PdfPage({
       // Cancel any running task
       renderTaskRef.current?.cancel();
 
-      const task = page.render({ canvasContext: ctx, viewport });
+      const task = page.render({ canvasContext: ctx, viewport, canvas: canvasRef.current! });
       renderTaskRef.current = task;
       await task.promise;
       hasRendered.current = true;

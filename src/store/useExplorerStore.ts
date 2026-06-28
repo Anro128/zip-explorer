@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { VFSNode, VFSFile, VFSZipFile, VFSFolder, SortConfig, BreadcrumbItem, SearchResult } from '../core/vfs/types';
+import type { VFSNode, VFSZipFile, VFSFolder, SortConfig, BreadcrumbItem, SearchResult } from '../core/vfs/types';
 
 interface RootZip {
   zipId: string;
@@ -52,7 +52,7 @@ interface ExplorerState {
   setPendingPassword: (v: ExplorerState['pendingPasswordFor']) => void;
 }
 
-export const useExplorerStore = create<ExplorerState>((set, get) => ({
+export const useExplorerStore = create<ExplorerState>((set, _get) => ({
   rootZips: [],
   currentPath: '',
   breadcrumbs: [],
@@ -122,7 +122,7 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
       return { loadingPaths: next };
     }),
 
-  updateZipNode: (zipId, update) =>
+  updateZipNode: (_zipId, update) =>
     set((s) => {
       const updateInTree = (nodes: VFSNode[]): VFSNode[] =>
         nodes.map((n) => {

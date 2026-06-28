@@ -1,11 +1,11 @@
-import React, { useMemo, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, ArrowUpDown, ArrowUp, ArrowDown, Plus, ChevronsDown, ChevronsUp } from 'lucide-react';
 import { useExplorerStore } from '../../store/useExplorerStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useZipLoader } from '../../hooks/useZipLoader';
 import { FileTreeItem } from './FileTreeItem';
 import { SearchBar } from './SearchBar';
-import type { VFSNode, VFSFile, SortConfig, SortField } from '../../core/vfs/types';
+import type { VFSFile, SortField } from '../../core/vfs/types';
 import { flattenNodes } from '../../core/vfs/ZipVFS';
 import { SEARCH_DEBOUNCE_MS, RECURSIVE_SEARCH_MAX } from '../../utils/constants';
 
@@ -105,10 +105,7 @@ export function FileTree() {
     input.onchange = async (e) => {
       const files = (e.target as HTMLInputElement).files;
       if (!files) return;
-      const { loadRootZip } = await import('../../core/vfs/ZipVFS').then(m => ({
-        loadRootZip: (f: File) => import('../../hooks/useZipLoader')
-      }));
-      // Use global loader via DOM event
+            // Use global loader via DOM event
       const event = new CustomEvent('load-zips', { detail: Array.from(files) });
       window.dispatchEvent(event);
     };

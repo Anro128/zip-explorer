@@ -24,11 +24,14 @@ export default defineConfig({
     target: 'esnext',
     rollupOptions: {
       output: {
-        manualChunks: {
-          'monaco': ['@monaco-editor/react'],
-          'pdfjs': ['pdfjs-dist'],
-          'react-vendor': ['react', 'react-dom'],
-          'zip': ['@zip.js/zip.js'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('@monaco-editor')) return 'monaco';
+            if (id.includes('pdfjs-dist')) return 'pdfjs';
+            if (id.includes('react') || id.includes('react-dom')) return 'react-vendor';
+            if (id.includes('@zip.js')) return 'zip';
+            return 'vendor';
+          }
         },
       },
     },

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Lock, X } from 'lucide-react';
 import { useExplorerStore } from '../../store/useExplorerStore';
 

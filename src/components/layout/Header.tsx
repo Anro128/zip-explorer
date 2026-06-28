@@ -1,4 +1,3 @@
-import React from 'react';
 import { Sun, Moon, Upload, Keyboard, Search } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useZipLoader } from '../../hooks/useZipLoader';
@@ -10,7 +9,7 @@ interface HeaderProps {
   onShowShortcuts: () => void;
 }
 
-export function Header({ onQuickOpen, onGlobalSearch, onShowShortcuts }: HeaderProps) {
+export function Header({ onQuickOpen, onShowShortcuts }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
   const { loadRootZip } = useZipLoader();
 
