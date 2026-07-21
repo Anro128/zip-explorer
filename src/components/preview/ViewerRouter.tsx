@@ -13,6 +13,10 @@ import { TextViewer } from '../viewers/TextViewer';
 import { DocxViewer } from '../viewers/DocxViewer';
 import { UnsupportedViewer } from '../viewers/UnsupportedViewer';
 
+import { SpreadsheetViewer } from '../viewers/SpreadsheetViewer';
+import { MediaViewer } from '../viewers/MediaViewer';
+import { PptxViewer } from '../viewers/PptxViewer';
+
 interface ViewerRouterProps {
   file: VFSFile;
 }
@@ -49,6 +53,12 @@ export function ViewerRouter({ file }: ViewerRouterProps) {
         return blobUrl ? <PdfViewer file={file} blobUrl={blobUrl} /> : null;
       case 'docx':
         return bytes ? <DocxViewer file={file} bytes={bytes} /> : null;
+      case 'spreadsheet':
+        return bytes ? <SpreadsheetViewer bytes={bytes} /> : null;
+      case 'media':
+        return blobUrl ? <MediaViewer file={file} blobUrl={blobUrl} /> : null;
+      case 'presentation':
+        return bytes ? <PptxViewer bytes={bytes} /> : null;
       case 'python':
       case 'code':
         return text !== null ? <CodeViewer file={file} text={text} /> : null;

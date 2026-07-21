@@ -4,7 +4,7 @@
 export type FileType =
   | 'pdf' | 'python' | 'notebook' | 'markdown' | 'text' | 'csv'
   | 'json' | 'image' | 'html' | 'xml' | 'yaml' | 'log' | 'zip'
-  | 'folder' | 'code' | 'docx' | 'unsupported';
+  | 'folder' | 'code' | 'docx' | 'spreadsheet' | 'media' | 'presentation' | 'unsupported';
 
 export interface VFSNodeBase {
   name: string;

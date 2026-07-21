@@ -6,6 +6,7 @@ const EXTENSION_MAP: Record<string, FileType> = {
   // Documents
   pdf: 'pdf',
   docx: 'docx',
+  doc: 'docx',
   // Python
   py: 'python',
   pyw: 'python',
@@ -81,6 +82,19 @@ const EXTENSION_MAP: Record<string, FileType> = {
   sql: 'code',
   dockerfile: 'code',
   makefile: 'code',
+  // Spreadsheet
+  xlsx: 'spreadsheet',
+  xls: 'spreadsheet',
+  // Presentation
+  pptx: 'presentation',
+  ppt: 'presentation',
+  // Media
+  mp4: 'media',
+  webm: 'media',
+  mkv: 'media',
+  mp3: 'media',
+  wav: 'media',
+  ogg: 'media',
   // ZIP (nested)
   zip: 'zip',
   gz: 'zip',
@@ -111,6 +125,16 @@ export function getMimeType(filename: string): string {
     json: 'application/json',
     xml: 'application/xml',
     zip: 'application/zip',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    xls: 'application/vnd.ms-excel',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    ppt: 'application/vnd.ms-powerpoint',
+    mp4: 'video/mp4',
+    webm: 'video/webm',
+    mkv: 'video/x-matroska',
+    mp3: 'audio/mpeg',
+    wav: 'audio/wav',
+    ogg: 'audio/ogg',
   };
   return mimeMap[ext] ?? 'application/octet-stream';
 }
@@ -137,6 +161,9 @@ export const FILE_ICONS: Record<FileType | 'folder', FileIconConfig> = {
   log: { emoji: '📜', colorClass: 'text-gray-400', label: 'Log' },
   code: { emoji: '💻', colorClass: 'text-blue-300', label: 'Code' },
   zip: { emoji: '📦', colorClass: 'text-yellow-500', label: 'ZIP Archive' },
+  spreadsheet: { emoji: '📊', colorClass: 'text-green-500', label: 'Spreadsheet' },
+  presentation: { emoji: '📽️', colorClass: 'text-orange-500', label: 'Presentation' },
+  media: { emoji: '🎵', colorClass: 'text-purple-500', label: 'Media' },
   folder: { emoji: '📁', colorClass: 'text-yellow-300', label: 'Folder' },
   unsupported: { emoji: '❓', colorClass: 'text-gray-500', label: 'Unknown' },
 };
