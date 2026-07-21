@@ -79,7 +79,7 @@ export function DropZone() {
       </div>
 
       <div style={{ display: 'flex', gap: 12 }}>
-        <button className="btn btn-primary" onClick={onBrowse} id="browse-zip-btn">
+        <button className="btn btn-secondary" onClick={onBrowse} id="browse-zip-btn">
           <FolderOpen size={14} />
           Browse Files
         </button>

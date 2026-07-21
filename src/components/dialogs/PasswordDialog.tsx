@@ -73,7 +73,7 @@ export function PasswordDialog() {
         )}
 
         <div className="dialog-actions">
-          <button className="btn btn-ghost" onClick={handleCancel}>Cancel</button>
+          <button className="btn btn-secondary" onClick={handleCancel}>Cancel</button>
           <button className="btn btn-primary" onClick={handleSubmit} id="password-submit-btn">
             <Lock size={13} />
             Open

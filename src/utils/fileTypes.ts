@@ -159,31 +159,31 @@ import React from 'react';
 
 export interface FileIconConfig {
   icon: React.ElementType;
-  colorClass: string;
+  color: string;
   label: string;
 }
 
 export const FILE_ICONS: Record<FileType | 'folder', FileIconConfig> = {
-  pdf: { icon: FileText, colorClass: 'text-red-400', label: 'PDF' },
-  docx: { icon: FileText, colorClass: 'text-blue-500', label: 'Word Document' },
-  python: { icon: Terminal, colorClass: 'text-blue-400', label: 'Python' },
-  notebook: { icon: BookOpen, colorClass: 'text-orange-400', label: 'Jupyter Notebook' },
-  markdown: { icon: FileText, colorClass: 'text-gray-300', label: 'Markdown' },
-  text: { icon: FileText, colorClass: 'text-gray-400', label: 'Text' },
-  csv: { icon: Table, colorClass: 'text-green-400', label: 'CSV' },
-  json: { icon: FileJson, colorClass: 'text-yellow-400', label: 'JSON' },
-  image: { icon: ImageIcon, colorClass: 'text-purple-400', label: 'Image' },
-  html: { icon: Code, colorClass: 'text-orange-400', label: 'HTML' },
-  xml: { icon: Code, colorClass: 'text-cyan-400', label: 'XML' },
-  yaml: { icon: FileJson, colorClass: 'text-teal-400', label: 'YAML' },
-  log: { icon: FileText, colorClass: 'text-gray-400', label: 'Log' },
-  code: { icon: FileCode, colorClass: 'text-blue-300', label: 'Code' },
-  zip: { icon: FileArchive, colorClass: 'text-yellow-500', label: 'ZIP Archive' },
-  spreadsheet: { icon: FileSpreadsheet, colorClass: 'text-green-500', label: 'Spreadsheet' },
-  presentation: { icon: Presentation, colorClass: 'text-orange-500', label: 'Presentation' },
-  media: { icon: Film, colorClass: 'text-purple-500', label: 'Media' },
-  folder: { icon: Folder, colorClass: 'text-yellow-300', label: 'Folder' },
-  unsupported: { icon: FileQuestion, colorClass: 'text-gray-500', label: 'Unknown' },
+  pdf: { icon: FileText, color: '#DC2626', label: 'PDF' },
+  docx: { icon: FileText, color: '#2563EB', label: 'Word Document' },
+  python: { icon: Terminal, color: '#CA8A04', label: 'Python' },
+  notebook: { icon: BookOpen, color: '#EA580C', label: 'Jupyter Notebook' },
+  markdown: { icon: FileText, color: '#52525B', label: 'Markdown' },
+  text: { icon: FileText, color: '#71717A', label: 'Text' },
+  csv: { icon: Table, color: '#16A34A', label: 'CSV' },
+  json: { icon: FileJson, color: '#71717A', label: 'JSON' },
+  image: { icon: ImageIcon, color: '#9333EA', label: 'Image' },
+  html: { icon: Code, color: '#F97316', label: 'HTML' },
+  xml: { icon: Code, color: '#71717A', label: 'XML' },
+  yaml: { icon: FileJson, color: '#71717A', label: 'YAML' },
+  log: { icon: FileText, color: '#71717A', label: 'Log' },
+  code: { icon: FileCode, color: '#2563EB', label: 'Code' },
+  zip: { icon: FileArchive, color: '#D97706', label: 'ZIP Archive' },
+  spreadsheet: { icon: FileSpreadsheet, color: '#16A34A', label: 'Spreadsheet' },
+  presentation: { icon: Presentation, color: '#EA580C', label: 'Presentation' },
+  media: { icon: Film, color: '#0891B2', label: 'Media' },
+  folder: { icon: Folder, color: '#EAB308', label: 'Folder' },
+  unsupported: { icon: FileQuestion, color: '#71717A', label: 'Unknown' },
 };
 
 export function getFileIcon(fileType: FileType): FileIconConfig {

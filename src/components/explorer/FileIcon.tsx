@@ -14,8 +14,8 @@ export function FileIcon({ fileType, className = '', style }: FileIconProps) {
   
   return (
     <span
-      className={`tree-item-icon ${config.colorClass} ${className} flex items-center justify-center`}
-      style={style}
+      className={`tree-item-icon ${className} flex items-center justify-center`}
+      style={{ ...style, color: config.color }}
       title={config.label}
       aria-label={config.label}
     >

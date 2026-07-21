@@ -56,7 +56,7 @@ export function Header({ onQuickOpen, onShowShortcuts }: HeaderProps) {
             width: '100%',
             background: 'var(--bg-tertiary)',
             border: '1px solid var(--border-default)',
-            borderRadius: 6,
+            borderRadius: 8,
             padding: '5px 12px',
             display: 'flex',
             alignItems: 'center',
@@ -78,7 +78,7 @@ export function Header({ onQuickOpen, onShowShortcuts }: HeaderProps) {
       {/* Actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
         <button
-          className="btn btn-primary"
+          className="btn btn-secondary"
           onClick={openZip}
           id="upload-zip-btn"
           style={{ fontSize: 12 }}
