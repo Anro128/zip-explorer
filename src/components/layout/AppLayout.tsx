@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { Archive, FolderOpen, Search } from 'lucide-react';
 import { Header } from './Header';
 import { SplitPanel } from './SplitPanel';
 import { useExplorerStore } from '../../store/useExplorerStore';
@@ -18,21 +19,21 @@ function StatusBar() {
   
   return (
     <div className="status-bar" id="status-bar">
-      <span className="status-item">
-        📦 {rootZips.length} ZIP{rootZips.length !== 1 ? 's' : ''} loaded
+      <span className="status-item flex items-center gap-1">
+        <Archive size={12} /> {rootZips.length} ZIP{rootZips.length !== 1 ? 's' : ''} loaded
       </span>
       {tabs.length > 0 && (
-        <span className="status-item">
-          📂 {tabs.length} tab{tabs.length !== 1 ? 's' : ''} open
+        <span className="status-item flex items-center gap-1">
+          <FolderOpen size={12} /> {tabs.length} tab{tabs.length !== 1 ? 's' : ''} open
         </span>
       )}
       {searchQuery && (
-        <span className="status-item">
-          🔍 {searchResults.length} results for "{searchQuery}"
+        <span className="status-item flex items-center gap-1">
+          <Search size={12} /> {searchResults.length} results for "{searchQuery}"
         </span>
       )}
       <span style={{ marginLeft: 'auto', opacity: 0.7 }}>
-        ZIP Explorer — No extraction. Pure virtual filesystem.
+        © 2026 Anro128. All rights reserved.
       </span>
     </div>
   );

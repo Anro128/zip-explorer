@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { MAX_JSON_COLLAPSE_DEPTH } from '../../utils/constants';
+import { AlertTriangle } from 'lucide-react';
 
 interface JsonNodeProps {
   data: unknown;
@@ -108,7 +109,7 @@ export function JsonViewer({ text }: JsonViewerProps) {
   if (error) {
     return (
       <div className="error-state">
-        <div className="error-icon">⚠️</div>
+        <div className="error-icon"><AlertTriangle size={32} strokeWidth={1.5} /></div>
         <div style={{ fontWeight: 600 }}>Invalid JSON</div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-danger)' }}>
           {error}

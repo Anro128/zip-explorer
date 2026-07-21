@@ -10,14 +10,16 @@ interface FileIconProps {
 
 export function FileIcon({ fileType, className = '', style }: FileIconProps) {
   const config = FILE_ICONS[fileType] ?? FILE_ICONS.unsupported;
+  const IconComponent = config.icon;
+  
   return (
     <span
-      className={`tree-item-icon ${config.colorClass} ${className}`}
+      className={`tree-item-icon ${config.colorClass} ${className} flex items-center justify-center`}
       style={style}
       title={config.label}
       aria-label={config.label}
     >
-      {config.emoji}
+      <IconComponent size={16} strokeWidth={2} />
     </span>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, Home } from 'lucide-react';
+import { ChevronRight, Home, Archive, Folder } from 'lucide-react';
 import type { BreadcrumbItem } from '../../core/vfs/types';
 
 interface BreadcrumbProps {
@@ -25,8 +25,8 @@ export function Breadcrumb({ items, onNavigate }: BreadcrumbProps) {
             onClick={() => onNavigate(item)}
             title={item.path}
           >
-            {item.nodeKind === 'zip' && <span style={{ marginRight: 3 }}>📦</span>}
-            {item.nodeKind === 'folder' && <span style={{ marginRight: 3 }}>📁</span>}
+            {item.nodeKind === 'zip' && <Archive size={11} className="inline-block mr-1" />}
+            {item.nodeKind === 'folder' && <Folder size={11} className="inline-block mr-1" />}
             {item.label}
           </span>
         </React.Fragment>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as mammoth from 'mammoth';
 import type { VFSFile } from '../../core/vfs/types';
+import { AlertTriangle } from 'lucide-react';
 
 interface DocxViewerProps {
   file: VFSFile;
@@ -42,7 +43,7 @@ export function DocxViewer({ file, bytes }: DocxViewerProps) {
   if (error) {
     return (
       <div className="error-state">
-        <div className="error-icon">⚠️</div>
+        <div className="error-icon"><AlertTriangle size={32} strokeWidth={1.5} /></div>
         <div style={{ fontWeight: 600 }}>Failed to read DOCX</div>
         <div style={{ fontSize: 11, color: 'var(--text-danger)', maxWidth: 400 }}>{error}</div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useState } from 'react';
+import { Lock } from 'lucide-react';
 
 interface HtmlViewerProps {
   text: string;
@@ -39,8 +40,8 @@ export function HtmlViewer({ text }: HtmlViewerProps) {
         >
           Source
         </button>
-        <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 8 }}>
-          🔒 Sandboxed — scripts disabled
+        <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Lock size={12} /> Sandboxed — scripts disabled
         </span>
       </div>
 

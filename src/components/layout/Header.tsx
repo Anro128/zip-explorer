@@ -1,4 +1,4 @@
-import { Sun, Moon, Upload, Keyboard, Search } from 'lucide-react';
+import { Sun, Moon, Upload, Keyboard, Search, Archive } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useZipLoader } from '../../hooks/useZipLoader';
 import { APP_NAME } from '../../utils/constants';
@@ -30,7 +30,7 @@ export function Header({ onQuickOpen, onShowShortcuts }: HeaderProps) {
     <header className="app-header" id="app-header">
       {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-        <span style={{ fontSize: 20 }}>📦</span>
+        <Archive size={20} className="text-accent" />
         <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
           {APP_NAME}
         </span>

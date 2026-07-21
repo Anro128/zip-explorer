@@ -139,33 +139,51 @@ export function getMimeType(filename: string): string {
   return mimeMap[ext] ?? 'application/octet-stream';
 }
 
+import {
+  FileText,
+  FileCode,
+  FileJson,
+  FileSpreadsheet,
+  FileArchive,
+  FileQuestion,
+  Image as ImageIcon,
+  Folder,
+  Presentation,
+  Film,
+  Terminal,
+  BookOpen,
+  Code,
+  Table
+} from 'lucide-react';
+import React from 'react';
+
 export interface FileIconConfig {
-  emoji: string;
+  icon: React.ElementType;
   colorClass: string;
   label: string;
 }
 
 export const FILE_ICONS: Record<FileType | 'folder', FileIconConfig> = {
-  pdf: { emoji: '📄', colorClass: 'text-red-400', label: 'PDF' },
-  docx: { emoji: '📝', colorClass: 'text-blue-500', label: 'Word Document' },
-  python: { emoji: '🐍', colorClass: 'text-blue-400', label: 'Python' },
-  notebook: { emoji: '📒', colorClass: 'text-orange-400', label: 'Jupyter Notebook' },
-  markdown: { emoji: '📝', colorClass: 'text-gray-300', label: 'Markdown' },
-  text: { emoji: '📃', colorClass: 'text-gray-400', label: 'Text' },
-  csv: { emoji: '📊', colorClass: 'text-green-400', label: 'CSV' },
-  json: { emoji: '{ }', colorClass: 'text-yellow-400', label: 'JSON' },
-  image: { emoji: '🖼️', colorClass: 'text-purple-400', label: 'Image' },
-  html: { emoji: '🌐', colorClass: 'text-orange-400', label: 'HTML' },
-  xml: { emoji: '📋', colorClass: 'text-cyan-400', label: 'XML' },
-  yaml: { emoji: '⚙️', colorClass: 'text-teal-400', label: 'YAML' },
-  log: { emoji: '📜', colorClass: 'text-gray-400', label: 'Log' },
-  code: { emoji: '💻', colorClass: 'text-blue-300', label: 'Code' },
-  zip: { emoji: '📦', colorClass: 'text-yellow-500', label: 'ZIP Archive' },
-  spreadsheet: { emoji: '📊', colorClass: 'text-green-500', label: 'Spreadsheet' },
-  presentation: { emoji: '📽️', colorClass: 'text-orange-500', label: 'Presentation' },
-  media: { emoji: '🎵', colorClass: 'text-purple-500', label: 'Media' },
-  folder: { emoji: '📁', colorClass: 'text-yellow-300', label: 'Folder' },
-  unsupported: { emoji: '❓', colorClass: 'text-gray-500', label: 'Unknown' },
+  pdf: { icon: FileText, colorClass: 'text-red-400', label: 'PDF' },
+  docx: { icon: FileText, colorClass: 'text-blue-500', label: 'Word Document' },
+  python: { icon: Terminal, colorClass: 'text-blue-400', label: 'Python' },
+  notebook: { icon: BookOpen, colorClass: 'text-orange-400', label: 'Jupyter Notebook' },
+  markdown: { icon: FileText, colorClass: 'text-gray-300', label: 'Markdown' },
+  text: { icon: FileText, colorClass: 'text-gray-400', label: 'Text' },
+  csv: { icon: Table, colorClass: 'text-green-400', label: 'CSV' },
+  json: { icon: FileJson, colorClass: 'text-yellow-400', label: 'JSON' },
+  image: { icon: ImageIcon, colorClass: 'text-purple-400', label: 'Image' },
+  html: { icon: Code, colorClass: 'text-orange-400', label: 'HTML' },
+  xml: { icon: Code, colorClass: 'text-cyan-400', label: 'XML' },
+  yaml: { icon: FileJson, colorClass: 'text-teal-400', label: 'YAML' },
+  log: { icon: FileText, colorClass: 'text-gray-400', label: 'Log' },
+  code: { icon: FileCode, colorClass: 'text-blue-300', label: 'Code' },
+  zip: { icon: FileArchive, colorClass: 'text-yellow-500', label: 'ZIP Archive' },
+  spreadsheet: { icon: FileSpreadsheet, colorClass: 'text-green-500', label: 'Spreadsheet' },
+  presentation: { icon: Presentation, colorClass: 'text-orange-500', label: 'Presentation' },
+  media: { icon: Film, colorClass: 'text-purple-500', label: 'Media' },
+  folder: { icon: Folder, colorClass: 'text-yellow-300', label: 'Folder' },
+  unsupported: { icon: FileQuestion, colorClass: 'text-gray-500', label: 'Unknown' },
 };
 
 export function getFileIcon(fileType: FileType): FileIconConfig {

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { AlertTriangle, BookOpen } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -227,7 +228,7 @@ export function NotebookViewer({ text }: NotebookViewerProps) {
   if (error || !parsed) {
     return (
       <div className="error-state">
-        <div className="error-icon">⚠️</div>
+        <div className="error-icon"><AlertTriangle size={32} strokeWidth={1.5} /></div>
         <div>Failed to parse notebook: {error}</div>
       </div>
     );
@@ -253,7 +254,7 @@ export function NotebookViewer({ text }: NotebookViewerProps) {
         fontSize: 12,
         color: 'var(--text-secondary)',
       }}>
-        <span>📒 Jupyter Notebook</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><BookOpen size={14} /> Jupyter Notebook</span>
         <span>Kernel: <strong style={{ color: 'var(--text-primary)' }}>{kernelDisplay}</strong></span>
         <span>Cells: <strong style={{ color: 'var(--text-primary)' }}>{parsed.cells.length}</strong></span>
         <span>nbformat: {parsed.nbformat}.{parsed.nbformat_minor}</span>

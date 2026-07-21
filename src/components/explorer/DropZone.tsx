@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useZipLoader } from '../../hooks/useZipLoader';
-import { FolderOpen } from 'lucide-react';
+import { SUPPORTED_VIEWERS_TEXT } from '../../utils/constants';
+import { FolderOpen, Archive, AlertTriangle } from 'lucide-react';
 
 export function DropZone() {
   const [isDragging, setIsDragging] = useState(false);
@@ -66,12 +67,14 @@ export function DropZone() {
       onDragLeave={onDragLeave}
       id="drop-zone"
     >
-      <div className="drop-zone-icon">📦</div>
+      <div className="drop-zone-icon flex justify-center items-center">
+        <Archive size={42} strokeWidth={1.5} />
+      </div>
 
       <div>
         <div className="drop-zone-title">Drop ZIP files here</div>
         <div className="drop-zone-subtitle" style={{ marginTop: 8 }}>
-          or click to browse — supports nested ZIPs, multiple files
+          or browse from your computer
         </div>
       </div>
 
@@ -90,13 +93,13 @@ export function DropZone() {
       )}
 
       {error && (
-        <div style={{ color: 'var(--text-danger)', fontSize: 12 }}>
-          ⚠️ {error}
+        <div style={{ color: 'var(--text-danger)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center' }}>
+          <AlertTriangle size={14} /> {error}
         </div>
       )}
 
       <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.8 }}>
-        Supported viewers: PDF · Docx · Python · Jupyter · Markdown · CSV · JSON · Image · HTML · XML · YAML · Text
+        {SUPPORTED_VIEWERS_TEXT}
       </div>
     </div>
   );

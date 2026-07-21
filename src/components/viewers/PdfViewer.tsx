@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, RotateCcw, AlertTriangle } from 'lucide-react';
 import type { VFSFile } from '../../core/vfs/types';
 import { PDF_INITIAL_SCALE } from '../../utils/constants';
 
@@ -180,7 +180,7 @@ export function PdfViewer({ file, blobUrl }: PdfViewerProps) {
   if (loadError) {
     return (
       <div className="error-state">
-        <div className="error-icon">⚠️</div>
+        <div className="error-icon"><AlertTriangle size={32} strokeWidth={1.5} /></div>
         <div style={{ fontWeight: 600 }}>Failed to load PDF</div>
         <div style={{ fontSize: 11, color: 'var(--text-danger)', maxWidth: 400 }}>{loadError}</div>
       </div>

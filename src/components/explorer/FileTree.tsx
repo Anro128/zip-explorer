@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { X, ArrowUpDown, ArrowUp, ArrowDown, Plus, ChevronsDown, ChevronsUp } from 'lucide-react';
+import { X, ArrowUpDown, ArrowUp, ArrowDown, Plus, ChevronsDown, ChevronsUp, Archive } from 'lucide-react';
 import { useExplorerStore } from '../../store/useExplorerStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useZipLoader } from '../../hooks/useZipLoader';
@@ -210,7 +210,7 @@ export function FileTree() {
               style={{ paddingLeft: 8, background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-muted)' }}
               title={rz.name}
             >
-              <span style={{ fontSize: 14 }}>📦</span>
+              <Archive size={14} className="text-accent" />
               <span className="tree-item-name" style={{ fontWeight: 600, color: 'var(--text-accent)' }}>
                 {rz.name}
               </span>
