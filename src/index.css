@@ -7,41 +7,43 @@
 /* ─────────────────────────────────────────────────────────────────────────── */
 :root {
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Geist', 'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  /* Dark theme (default) */
-  --bg-primary:   #0d1117;
-  --bg-secondary: #161b22;
-  --bg-tertiary:  #21262d;
-  --bg-hover:     #30363d;
-  --bg-selected:  #1f6feb33;
-  --bg-active:    #1f6feb55;
+  /* Dark theme (Vercel Inspired) */
+  --bg-primary: #09090B;
+  --bg-secondary: #18181B;
+  --bg-tertiary: #202024;
+  --bg-hover: #27272A;
+  --bg-selected: rgba(59,130,246,0.15);
+  --bg-active: rgba(59,130,246,0.25);
+  --bg-header: rgba(9,9,11,0.85);
+  --bg-sidebar: #111113;
 
-  --border-default:  #30363d;
-  --border-muted:    #21262d;
-  --border-emphasis: #8b949e;
+  --border-default: #2E2E33;
+  --border-muted: #27272A;
+  --border-emphasis: #52525B;
 
-  --text-primary:   #e6edf3;
-  --text-secondary: #8b949e;
-  --text-muted:     #6e7681;
-  --text-accent:    #58a6ff;
-  --text-success:   #3fb950;
-  --text-warning:   #d29922;
-  --text-danger:    #f85149;
+  --text-primary: #FAFAFA;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --text-accent: #60A5FA;
+  --text-success: #22C55E;
+  --text-warning: #FACC15;
+  --text-danger: #EF4444;
 
-  --accent-primary: #1f6feb;
-  --accent-hover:   #388bfd;
-  --accent-muted:   #1f6feb22;
+  --accent-primary: #3B82F6;
+  --accent-hover: #60A5FA;
+  --accent-muted: rgba(59,130,246,0.15);
 
-  --scrollbar-thumb: #30363d;
-  --scrollbar-hover: #484f58;
+  --scrollbar-thumb: #27272A;
+  --scrollbar-hover: #3F3F46;
 
   /* Shadows */
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
-  --shadow-md:  0 4px 12px rgba(0,0,0,0.5);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.6);
-  --shadow-glow: 0 0 20px rgba(31,111,235,0.15);
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md:  0 4px 6px rgba(0,0,0,0.05);
+  --shadow-lg:  0 10px 15px rgba(0,0,0,0.05);
+  --shadow-glow: 0 0 20px rgba(0,112,243,0.1);
 
   /* Spacing */
   --header-height: 48px;
@@ -56,31 +58,33 @@
 }
 
 [data-theme='light'] {
-  --bg-primary:   #ffffff;
-  --bg-secondary: #f6f8fa;
-  --bg-tertiary:  #eaeef2;
-  --bg-hover:     #dde3eb;
-  --bg-selected:  #dbeafe;
-  --bg-active:    #bfdbfe;
+  --bg-primary: #FAFAFA;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F4F4F5;
+  --bg-hover: #F5F5F5;
+  --bg-selected: #E6F1FF;
+  --bg-active: #CDE2FF;
+  --bg-header: rgba(255,255,255,0.85);
+  --bg-sidebar: #FCFCFC;
 
-  --border-default:  #d0d7de;
-  --border-muted:    #eaeef2;
-  --border-emphasis: #6e7781;
+  --border-default: #E4E4E7;
+  --border-muted: #E4E4E7;
+  --border-emphasis: #A1A1AA;
 
-  --text-primary:   #1f2328;
-  --text-secondary: #656d76;
-  --text-muted:     #9198a1;
-  --text-accent:    #0969da;
-  --text-success:   #1a7f37;
-  --text-warning:   #9a6700;
-  --text-danger:    #d1242f;
+  --text-primary: #09090B;
+  --text-secondary: #71717A;
+  --text-muted: #A1A1AA;
+  --text-accent: #0070F3;
+  --text-success: #16A34A;
+  --text-warning: #EAB308;
+  --text-danger: #DC2626;
 
-  --accent-primary: #0969da;
-  --accent-hover:   #0550ae;
-  --accent-muted:   #0969da15;
+  --accent-primary: #0070F3;
+  --accent-hover: #0064D6;
+  --accent-muted: rgba(0, 112, 243, 0.15);
 
-  --scrollbar-thumb: #d0d7de;
-  --scrollbar-hover: #b1bac4;
+  --scrollbar-thumb: #D4D4D8;
+  --scrollbar-hover: #A1A1AA;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -143,7 +147,9 @@ code, pre, .font-mono {
 .app-header {
   height: var(--header-height);
   min-height: var(--header-height);
-  background: var(--bg-secondary);
+  background: var(--bg-header);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-default);
   display: flex;
   align-items: center;
@@ -162,7 +168,7 @@ code, pre, .font-mono {
 
 /* Explorer Panel */
 .explorer-panel {
-  background: var(--bg-secondary);
+  background: var(--bg-sidebar);
   border-right: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
@@ -220,6 +226,9 @@ code, pre, .font-mono {
 
 .tree-item.selected {
   background: var(--bg-selected);
+  border-left: 2px solid var(--accent-primary);
+  border-radius: 0 4px 4px 0;
+  padding-left: 6px; /* offset the 2px border */
 }
 
 .tree-item.active {
@@ -371,7 +380,7 @@ code, pre, .font-mono {
   width: 100%;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-default);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 5px 10px 5px 32px;
   font-size: 12px;
   color: var(--text-primary);
@@ -394,7 +403,7 @@ code, pre, .font-mono {
   align-items: center;
   gap: 6px;
   padding: 5px 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -426,6 +435,16 @@ code, pre, .font-mono {
   color: var(--text-primary);
 }
 
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+}
+
 .btn-icon {
   width: 28px;
   height: 28px;
@@ -450,7 +469,7 @@ code, pre, .font-mono {
 .drop-zone-active {
   background: var(--accent-muted);
   border: 2px dashed var(--accent-primary);
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .drop-zone-icon {
@@ -609,7 +628,7 @@ code, pre, .font-mono {
   width: 100%;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-default);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px 12px;
   font-size: 13px;
   color: var(--text-primary);
@@ -644,7 +663,7 @@ code, pre, .font-mono {
 .quick-open {
   background: var(--bg-secondary);
   border: 1px solid var(--border-default);
-  border-radius: 10px;
+  border-radius: 12px;
   width: 600px;
   max-width: 90vw;
   max-height: 70vh;
@@ -1097,13 +1116,14 @@ code, pre, .font-mono {
 /* Status bar */
 .status-bar {
   height: 22px;
-  background: var(--accent-primary);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   padding: 0 12px;
   gap: 16px;
   font-size: 11px;
-  color: rgba(255,255,255,0.85);
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 

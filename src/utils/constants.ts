@@ -1,5 +1,6 @@
 export const APP_NAME = 'ZIP Explorer';
 export const APP_VERSION = '1.0.0';
+export const SUPPORTED_VIEWERS_TEXT = 'Supports PDF, Office, Media, Code, Data & Nested ZIP Archives';
 
 export const MAX_CACHE_MB = 100;
 export const MAX_NESTED_ZIP_DEPTH = 20;   // safety limit

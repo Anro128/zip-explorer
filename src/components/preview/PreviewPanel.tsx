@@ -1,6 +1,7 @@
 import { TabBar } from './TabBar';
 import { ViewerRouter } from './ViewerRouter';
 import { usePreviewStore } from '../../store/usePreviewStore';
+import { SUPPORTED_VIEWERS_TEXT } from '../../utils/constants';
 import { FolderOpen } from 'lucide-react';
 
 export function PreviewPanel() {
@@ -65,7 +66,7 @@ export function PreviewPanel() {
               Select a file from the explorer to preview it
             </div>
             <div style={{ color: 'var(--text-muted)', fontSize: 12, opacity: 0.7 }}>
-              Supported viewers: PDF · Docx · Python · Jupyter · Markdown · CSV · JSON · Image · HTML · XML · YAML · Text
+              {SUPPORTED_VIEWERS_TEXT}
             </div>
           </div>
         ) : (

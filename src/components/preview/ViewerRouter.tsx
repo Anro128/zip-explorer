@@ -1,5 +1,6 @@
 import type { VFSFile } from '../../core/vfs/types';
 import { useFileContent } from '../../hooks/useFileContent';
+import { AlertTriangle } from 'lucide-react';
 import { PdfViewer } from '../viewers/PdfViewer';
 import { CodeViewer } from '../viewers/CodeViewer';
 import { MarkdownViewer } from '../viewers/MarkdownViewer';
@@ -36,7 +37,7 @@ export function ViewerRouter({ file }: ViewerRouterProps) {
   if (error) {
     return (
       <div className="error-state">
-        <div className="error-icon">⚠️</div>
+        <div className="error-icon"><AlertTriangle size={32} strokeWidth={1.5} /></div>
         <div style={{ fontWeight: 600 }}>Failed to load file</div>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-danger)', maxWidth: 400, wordBreak: 'break-word' }}>
           {error}

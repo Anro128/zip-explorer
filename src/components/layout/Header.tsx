@@ -1,4 +1,4 @@
-import { Sun, Moon, Upload, Keyboard, Search } from 'lucide-react';
+import { Sun, Moon, Upload, Keyboard, Search, Archive } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useZipLoader } from '../../hooks/useZipLoader';
 import { APP_NAME } from '../../utils/constants';
@@ -30,7 +30,7 @@ export function Header({ onQuickOpen, onShowShortcuts }: HeaderProps) {
     <header className="app-header" id="app-header">
       {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-        <span style={{ fontSize: 20 }}>📦</span>
+        <Archive size={20} className="text-accent" />
         <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
           {APP_NAME}
         </span>
@@ -56,7 +56,7 @@ export function Header({ onQuickOpen, onShowShortcuts }: HeaderProps) {
             width: '100%',
             background: 'var(--bg-tertiary)',
             border: '1px solid var(--border-default)',
-            borderRadius: 6,
+            borderRadius: 8,
             padding: '5px 12px',
             display: 'flex',
             alignItems: 'center',
@@ -78,7 +78,7 @@ export function Header({ onQuickOpen, onShowShortcuts }: HeaderProps) {
       {/* Actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
         <button
-          className="btn btn-primary"
+          className="btn btn-secondary"
           onClick={openZip}
           id="upload-zip-btn"
           style={{ fontSize: 12 }}
