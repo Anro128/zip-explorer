@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import * as XLSX from 'xlsx';
-import { Search } from 'lucide-react';
+import { Search, ChevronUp, ChevronDown } from 'lucide-react';
 import { HighlightText } from '../common/HighlightText';
 
 interface SpreadsheetViewerProps {
@@ -62,11 +62,41 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
     return r;
   }, [rows, sortCol, sortDir]);
 
-  const matchCount = useMemo(() => {
-    if (!filter.trim()) return 0;
-    const q = filter.toLowerCase();
-    return rows.filter((row) => row.some((cell) => cell.toLowerCase().includes(q))).length;
-  }, [rows, filter]);
+  const [activeMatchIndex, setActiveMatchIndex] = useState(0);
+
+  const matchData = useMemo(() => {
+    if (!filter.trim()) return { total: 0, rowStarts: [] };
+    const regex = new RegExp(`(${filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    let total = 0;
+    const rowStarts = sortedRows.map(row => {
+      return row.map(cell => {
+        const start = total;
+        total += (cell.match(regex) || []).length;
+        return start;
+      });
+    });
+    return { total, rowStarts };
+  }, [sortedRows, filter]);
+
+  // Reset active match when filter changes
+  useEffect(() => {
+    setActiveMatchIndex(0);
+  }, [filter]);
+
+  // Auto-scroll to active match
+  useEffect(() => {
+    if (matchData.total > 0) {
+      const el = document.getElementById('active-search-match');
+      if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }, [activeMatchIndex, matchData.total]);
+
+  const nextMatch = () => {
+    if (matchData.total > 0) setActiveMatchIndex(prev => (prev + 1) % matchData.total);
+  };
+  const prevMatch = () => {
+    if (matchData.total > 0) setActiveMatchIndex(prev => (prev - 1 + matchData.total) % matchData.total);
+  };
 
   const toggleSort = (colIdx: number) => {
     if (sortCol === colIdx) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -96,18 +126,40 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
           </select>
         )}
         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-          {filter.trim() ? `${matchCount} matches · ` : ''}{rows.length} rows · {headers.length} cols
+          {filter.trim() && matchData.total > 0 ? `${activeMatchIndex + 1} of ${matchData.total} matches · ` : filter.trim() ? `0 matches · ` : ''}{rows.length} rows · {headers.length} cols
         </span>
         <div style={{ flex: 1 }} />
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <Search size={11} style={{ position: 'absolute', left: 8, color: 'var(--text-muted)' }} />
           <input
             className="search-input"
-            style={{ paddingLeft: 26, width: 200 }}
+            style={{ paddingLeft: 26, paddingRight: filter.trim() ? 50 : 8, width: 220 }}
             placeholder="Search in Spreadsheet..."
             value={filter}
             onChange={e => setFilter(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                if (e.shiftKey) prevMatch();
+                else nextMatch();
+              }
+            }}
           />
+          {filter.trim() && matchData.total > 0 && (
+            <div style={{ position: 'absolute', right: 4, display: 'flex', gap: 2 }}>
+              <button 
+                onClick={prevMatch}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}
+              >
+                <ChevronUp size={14} />
+              </button>
+              <button 
+                onClick={nextMatch}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}
+              >
+                <ChevronDown size={14} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -132,7 +184,7 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
               <tr key={ri}>
                 <td style={{ color: 'var(--text-muted)', textAlign: 'right' }}>{ri + 1}</td>
                 {headers.map((_, ci) => (
-                  <td key={ci}>{row[ci] ? <HighlightText text={row[ci]} query={filter} /> : ''}</td>
+                  <td key={ci}>{row[ci] ? <HighlightText text={row[ci]} query={filter} matchStartIndex={matchData.rowStarts[ri]?.[ci]} activeMatchIndex={activeMatchIndex} /> : ''}</td>
                 ))}
               </tr>
             ))}
