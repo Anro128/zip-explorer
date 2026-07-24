@@ -21,6 +21,15 @@ Zip Explorer includes highly optimized built-in viewers for almost any file type
 - **Media:** First-class support for images, video, and audio.
 - **Markdown & JSON:** Beautifully formatted and rendered with structure.
 
+## Screenshots
+
+<p align="center">
+  <img src="./public/preview1.png" alt="Preview 1" width="80%">
+</p>
+<p align="center">
+  <img src="./public/preview2.png" alt="Preview 2" width="80%">
+</p>
+
 ## Tech Stack
 
 - **Framework:** React 19 + TypeScript + Vite
@@ -38,7 +47,7 @@ Make sure you have Node.js and npm installed.
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Anro128/zip-explorer.git
    cd zip-explorer
    ```
 2. Install dependencies:
