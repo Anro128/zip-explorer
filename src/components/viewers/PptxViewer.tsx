@@ -90,7 +90,7 @@ export function PptxViewer({ bytes }: PptxViewerProps) {
   }
 
   return (
-    <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: '#e5e7eb', overflow: 'hidden' }}>
+    <div className="pptx-viewer" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: '#e5e7eb', overflow: 'hidden' }}>
       {isLoading && (
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 10, background: 'rgba(229, 231, 235, 0.8)' }}>
           <div className="spinner" style={{ borderColor: 'var(--border-default)', borderTopColor: 'var(--accent-primary)' }} />

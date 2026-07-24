@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, RotateCcw, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, AlertTriangle } from 'lucide-react';
 import type { VFSFile } from '../../core/vfs/types';
 import { PDF_INITIAL_SCALE } from '../../utils/constants';
 
 // ── Import pdfjs-dist at module level (not lazily) so it's ready immediately ──
 import * as pdfjsLib from 'pdfjs-dist';
+import { usePreviewStore } from '../../store/usePreviewStore';
 
 // @ts-ignore
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
@@ -42,6 +43,8 @@ function PdfPage({
       const viewport = page.getViewport({ scale });
       canvas.width = viewport.width;
       canvas.height = viewport.height;
+      canvas.style.width = `${viewport.width}px`;
+      canvas.style.height = `${viewport.height}px`;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
@@ -94,20 +97,19 @@ function PdfPage({
       ref={wrapperRef}
       id={`pdf-page-${pageNum}`}
       style={{
-        display: 'flex',
-        justifyContent: 'center',
         padding: '8px 0',
         minHeight: `${800 * scale}px`,
+        textAlign: 'center',
       }}
     >
       <canvas
         ref={canvasRef}
         style={{
           display: 'block',
+          margin: '0 auto',
           boxShadow: '0 2px 12px rgba(0,0,0,0.4)',
           borderRadius: 2,
           background: '#fff',
-          maxWidth: '100%',
         }}
       />
     </div>
@@ -118,8 +120,10 @@ export function PdfViewer({ file, blobUrl }: PdfViewerProps) {
   const [pdf, setPdf] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [scale, setScale] = useState(PDF_INITIAL_SCALE);
   const [pageInput, setPageInput] = useState('1');
+  const { tabs, activeTabId } = usePreviewStore();
+  const activeTab = tabs.find((t) => t.id === activeTabId);
+  const scale = activeTab?.zoom ?? PDF_INITIAL_SCALE;
   const [loadError, setLoadError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -229,19 +233,6 @@ export function PdfViewer({ file, blobUrl }: PdfViewerProps) {
 
         <div style={{ width: 1, height: 16, background: 'var(--border-default)', margin: '0 4px' }} />
 
-        <button className="btn btn-ghost btn-icon" onClick={() => setScale(s => Math.min(s + 0.25, 4))} title="Zoom In">
-          <ZoomIn size={14} />
-        </button>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)', minWidth: 40, textAlign: 'center' }}>
-          {Math.round(scale * 100)}%
-        </span>
-        <button className="btn btn-ghost btn-icon" onClick={() => setScale(s => Math.max(s - 0.25, 0.25))} title="Zoom Out">
-          <ZoomOut size={14} />
-        </button>
-        <button className="btn btn-ghost btn-icon" onClick={() => setScale(PDF_INITIAL_SCALE)} title="Reset zoom">
-          <RotateCcw size={14} />
-        </button>
-
         <div style={{ flex: 1 }} />
 
         <button className="btn btn-ghost" onClick={handleDownload}>
@@ -253,7 +244,7 @@ export function PdfViewer({ file, blobUrl }: PdfViewerProps) {
       <div
         ref={containerRef}
         className="pdf-pages"
-        style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '8px 0' }}
+        style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: '8px 0' }}
       >
         {!pdf ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 200, gap: 12 }}>

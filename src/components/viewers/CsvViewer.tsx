@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
+import { HighlightText } from '../common/HighlightText';
 
 interface CsvViewerProps {
   text: string;
@@ -40,14 +41,10 @@ export function CsvViewer({ text }: CsvViewerProps) {
 
   const { headers, rows } = useMemo(() => parseCsv(text), [text]);
 
-  const filteredRows = useMemo(() => {
-    let r = rows;
-    if (filter.trim()) {
-      const q = filter.toLowerCase();
-      r = r.filter((row) => row.some((cell) => cell.toLowerCase().includes(q)));
-    }
+  const sortedRows = useMemo(() => {
+    let r = [...rows];
     if (sortCol !== null) {
-      r = [...r].sort((a, b) => {
+      r.sort((a, b) => {
         const av = a[sortCol] ?? '';
         const bv = b[sortCol] ?? '';
         const n1 = parseFloat(av), n2 = parseFloat(bv);
@@ -56,7 +53,13 @@ export function CsvViewer({ text }: CsvViewerProps) {
       });
     }
     return r;
-  }, [rows, filter, sortCol, sortDir]);
+  }, [rows, sortCol, sortDir]);
+
+  const matchCount = useMemo(() => {
+    if (!filter.trim()) return 0;
+    const q = filter.toLowerCase();
+    return rows.filter((row) => row.some((cell) => cell.toLowerCase().includes(q))).length;
+  }, [rows, filter]);
 
   const toggleSort = (colIdx: number) => {
     if (sortCol === colIdx) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -68,7 +71,7 @@ export function CsvViewer({ text }: CsvViewerProps) {
       {/* Toolbar */}
       <div style={{ padding: '6px 12px', borderBottom: '1px solid var(--border-muted)', display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-          {filteredRows.length}/{rows.length} rows · {headers.length} cols
+          {filter.trim() ? `${matchCount} matches · ` : ''}{rows.length} rows · {headers.length} cols
         </span>
         <div style={{ flex: 1 }} />
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -76,7 +79,7 @@ export function CsvViewer({ text }: CsvViewerProps) {
           <input
             className="search-input"
             style={{ paddingLeft: 26, width: 200 }}
-            placeholder="Filter rows..."
+            placeholder="Search in CSV..."
             value={filter}
             onChange={e => setFilter(e.target.value)}
             id="csv-filter"
@@ -101,11 +104,11 @@ export function CsvViewer({ text }: CsvViewerProps) {
             </tr>
           </thead>
           <tbody>
-            {filteredRows.map((row, ri) => (
+            {sortedRows.map((row, ri) => (
               <tr key={ri}>
                 <td style={{ color: 'var(--text-muted)', textAlign: 'right' }}>{ri + 1}</td>
                 {headers.map((_, ci) => (
-                  <td key={ci}>{row[ci] ?? ''}</td>
+                  <td key={ci}>{row[ci] ? <HighlightText text={row[ci]} query={filter} /> : ''}</td>
                 ))}
               </tr>
             ))}

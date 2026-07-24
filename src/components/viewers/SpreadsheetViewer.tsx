@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { Search } from 'lucide-react';
+import { HighlightText } from '../common/HighlightText';
 
 interface SpreadsheetViewerProps {
   bytes: Uint8Array;
@@ -47,14 +48,10 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
     return { headers, rows };
   }, [workbook, activeSheet]);
 
-  const filteredRows = useMemo(() => {
-    let r = rows;
-    if (filter.trim()) {
-      const q = filter.toLowerCase();
-      r = r.filter((row) => row.some((cell) => cell.toLowerCase().includes(q)));
-    }
+  const sortedRows = useMemo(() => {
+    let r = [...rows];
     if (sortCol !== null) {
-      r = [...r].sort((a, b) => {
+      r.sort((a, b) => {
         const av = a[sortCol] ?? '';
         const bv = b[sortCol] ?? '';
         const n1 = parseFloat(av), n2 = parseFloat(bv);
@@ -63,7 +60,13 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
       });
     }
     return r;
-  }, [rows, filter, sortCol, sortDir]);
+  }, [rows, sortCol, sortDir]);
+
+  const matchCount = useMemo(() => {
+    if (!filter.trim()) return 0;
+    const q = filter.toLowerCase();
+    return rows.filter((row) => row.some((cell) => cell.toLowerCase().includes(q))).length;
+  }, [rows, filter]);
 
   const toggleSort = (colIdx: number) => {
     if (sortCol === colIdx) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -93,7 +96,7 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
           </select>
         )}
         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-          {filteredRows.length}/{rows.length} rows · {headers.length} cols
+          {filter.trim() ? `${matchCount} matches · ` : ''}{rows.length} rows · {headers.length} cols
         </span>
         <div style={{ flex: 1 }} />
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -101,7 +104,7 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
           <input
             className="search-input"
             style={{ paddingLeft: 26, width: 200 }}
-            placeholder="Filter rows..."
+            placeholder="Search in Spreadsheet..."
             value={filter}
             onChange={e => setFilter(e.target.value)}
           />
@@ -125,11 +128,11 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
             </tr>
           </thead>
           <tbody>
-            {filteredRows.map((row, ri) => (
+            {sortedRows.map((row, ri) => (
               <tr key={ri}>
                 <td style={{ color: 'var(--text-muted)', textAlign: 'right' }}>{ri + 1}</td>
                 {headers.map((_, ci) => (
-                  <td key={ci}>{row[ci] ?? ''}</td>
+                  <td key={ci}>{row[ci] ? <HighlightText text={row[ci]} query={filter} /> : ''}</td>
                 ))}
               </tr>
             ))}

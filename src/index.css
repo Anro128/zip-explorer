@@ -1192,3 +1192,21 @@ code, pre, .font-mono {
 .docx-content table { border-collapse: collapse; margin: 1em 0; width: 100%; }
 .docx-content td, .docx-content th { border: 1px solid #ccc; padding: 4px 8px; }
 .docx-content img { max-width: 100%; height: auto; }
+
+/* Zoom Controls */
+.preview-content .csv-viewer,
+.preview-content .html-viewer iframe,
+.preview-content .docx-content,
+.preview-content .markdown-viewer,
+.preview-content .json-viewer,
+.preview-content .text-viewer,
+.preview-content .pptx-viewer,
+.preview-content .notebook-viewer {
+  zoom: var(--viewer-zoom, 1);
+}
+
+.preview-content .image-viewer img,
+.preview-content .media-viewer video {
+  transform: scale(var(--viewer-zoom, 1));
+  transform-origin: top left;
+}

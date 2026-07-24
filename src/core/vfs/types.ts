@@ -87,6 +87,7 @@ export interface OpenTab {
   file: VFSFile;
   label: string;
   isPinned: boolean;
+  zoom?: number;
 }
 
 export interface FileContentResult {
