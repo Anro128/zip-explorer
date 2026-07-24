@@ -127,6 +127,9 @@ export function PdfViewer({ file, blobUrl }: PdfViewerProps) {
   const [loadError, setLoadError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const CHUNK_SIZE = 10;
+  const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
+
   // ── Load PDF — fast because pdfjs is pre-imported ──────────────────────
   useEffect(() => {
     if (!blobUrl) return;
@@ -164,9 +167,27 @@ export function PdfViewer({ file, blobUrl }: PdfViewerProps) {
     const clamped = Math.max(1, Math.min(n, numPages));
     setCurrentPage(clamped);
     setPageInput(String(clamped));
-    const el = document.getElementById(`pdf-page-${clamped}`);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [pdf, numPages]);
+    
+    if (clamped > visibleCount) {
+      setVisibleCount(Math.min(clamped + 5, numPages));
+      setTimeout(() => {
+        const el = document.getElementById(`pdf-page-${clamped}`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 0);
+    } else {
+      const el = document.getElementById(`pdf-page-${clamped}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [pdf, numPages, visibleCount]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    if (scrollTop + clientHeight >= scrollHeight - 1000) {
+      if (visibleCount < numPages) {
+        setVisibleCount(v => Math.min(v + CHUNK_SIZE, numPages));
+      }
+    }
+  };
 
   const handleDownload = async () => {
     const a = document.createElement('a');
@@ -245,6 +266,7 @@ export function PdfViewer({ file, blobUrl }: PdfViewerProps) {
         ref={containerRef}
         className="pdf-pages"
         style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: '8px 0' }}
+        onScroll={handleScroll}
       >
         {!pdf ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 200, gap: 12 }}>
@@ -252,7 +274,7 @@ export function PdfViewer({ file, blobUrl }: PdfViewerProps) {
             <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Loading PDF…</span>
           </div>
         ) : (
-          Array.from({ length: numPages }, (_, i) => i + 1).map(pageNum => (
+          Array.from({ length: Math.min(numPages, visibleCount) }, (_, i) => i + 1).map(pageNum => (
             <PdfPage
               key={pageNum}
               pdf={pdf}

@@ -41,6 +41,9 @@ export function CsvViewer({ text }: CsvViewerProps) {
 
   const { headers, rows } = useMemo(() => parseCsv(text), [text]);
 
+  const CHUNK_SIZE = 100;
+  const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
+
   const sortedRows = useMemo(() => {
     let r = [...rows];
     if (sortCol !== null) {
@@ -76,13 +79,32 @@ export function CsvViewer({ text }: CsvViewerProps) {
     setActiveMatchIndex(0);
   }, [filter]);
 
-  // Auto-scroll to active match
+  // Auto-scroll to active match and smart expand
   useEffect(() => {
     if (matchData.total > 0) {
-      const el = document.getElementById('active-search-match');
-      if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const targetRowIdx = matchData.rowStarts.findIndex((cellStarts, idx) => {
+        const rowStart = cellStarts[0] ?? matchData.total;
+        const nextRowStart = matchData.rowStarts[idx + 1]?.[0] ?? matchData.total;
+        return activeMatchIndex >= rowStart && activeMatchIndex < nextRowStart;
+      });
+
+      if (targetRowIdx !== -1 && targetRowIdx >= visibleCount) {
+        setVisibleCount(Math.min(targetRowIdx + 50, sortedRows.length));
+      } else {
+        const el = document.getElementById('active-search-match');
+        if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
     }
-  }, [activeMatchIndex, matchData.total]);
+  }, [activeMatchIndex, matchData, visibleCount, sortedRows.length]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    if (scrollTop + clientHeight >= scrollHeight - 300) {
+      if (visibleCount < sortedRows.length) {
+        setVisibleCount(v => Math.min(v + CHUNK_SIZE, sortedRows.length));
+      }
+    }
+  };
 
   const nextMatch = () => {
     if (matchData.total > 0) setActiveMatchIndex(prev => (prev + 1) % matchData.total);
@@ -140,7 +162,7 @@ export function CsvViewer({ text }: CsvViewerProps) {
       </div>
 
       {/* Table */}
-      <div className="csv-viewer">
+      <div className="csv-viewer" onScroll={handleScroll}>
         <table className="csv-table">
           <thead>
             <tr>
@@ -156,7 +178,7 @@ export function CsvViewer({ text }: CsvViewerProps) {
             </tr>
           </thead>
           <tbody>
-            {sortedRows.map((row, ri) => (
+            {sortedRows.slice(0, visibleCount).map((row, ri) => (
               <tr key={ri}>
                 <td style={{ color: 'var(--text-muted)', textAlign: 'right' }}>{ri + 1}</td>
                 {headers.map((_, ci) => (

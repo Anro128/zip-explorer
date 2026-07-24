@@ -12,6 +12,9 @@ export function TextViewer({ text }: TextViewerProps) {
   const lines = useMemo(() => text.split('\n'), [text]);
   const lineNumWidth = String(lines.length).length;
 
+  const CHUNK_SIZE = 100;
+  const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
+
   const [activeMatchIndex, setActiveMatchIndex] = useState(0);
 
   const matchData = useMemo(() => {
@@ -31,13 +34,31 @@ export function TextViewer({ text }: TextViewerProps) {
     setActiveMatchIndex(0);
   }, [filter]);
 
-  // Auto-scroll to active match
+  // Auto-scroll to active match and smart expand
   useEffect(() => {
     if (matchData.total > 0) {
-      const el = document.getElementById('active-search-match');
-      if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const targetLineIdx = matchData.lineStarts.findIndex((start, idx) => {
+        const nextStart = matchData.lineStarts[idx + 1] ?? matchData.total;
+        return activeMatchIndex >= start && activeMatchIndex < nextStart;
+      });
+
+      if (targetLineIdx !== -1 && targetLineIdx >= visibleCount) {
+        setVisibleCount(Math.min(targetLineIdx + 50, lines.length));
+      } else {
+        const el = document.getElementById('active-search-match');
+        if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
     }
-  }, [activeMatchIndex, matchData.total]);
+  }, [activeMatchIndex, matchData, visibleCount, lines.length]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    if (scrollTop + clientHeight >= scrollHeight - 300) {
+      if (visibleCount < lines.length) {
+        setVisibleCount(v => Math.min(v + CHUNK_SIZE, lines.length));
+      }
+    }
+  };
 
   const nextMatch = () => {
     if (matchData.total > 0) setActiveMatchIndex(prev => (prev + 1) % matchData.total);
@@ -100,10 +121,11 @@ export function TextViewer({ text }: TextViewerProps) {
         }}
         id="text-viewer"
         className="text-viewer"
+        onScroll={handleScroll}
       >
         <table style={{ borderCollapse: 'collapse', width: '100%', tableLayout: 'fixed' }}>
           <tbody>
-            {lines.map((line, idx) => (
+            {lines.slice(0, visibleCount).map((line, idx) => (
               <tr key={idx} style={{ lineHeight: '20px' }}>
                 <td
                   style={{
