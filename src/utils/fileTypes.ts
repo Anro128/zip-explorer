@@ -85,6 +85,11 @@ const EXTENSION_MAP: Record<string, FileType> = {
   // Spreadsheet
   xlsx: 'spreadsheet',
   xls: 'spreadsheet',
+  xlsb: 'spreadsheet',
+  xlsm: 'spreadsheet',
+  xltx: 'spreadsheet',
+  xltm: 'spreadsheet',
+  xlam: 'spreadsheet',
   // Presentation
   pptx: 'presentation',
   ppt: 'presentation',
@@ -127,6 +132,11 @@ export function getMimeType(filename: string): string {
     zip: 'application/zip',
     xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     xls: 'application/vnd.ms-excel',
+    xlsb: 'application/vnd.ms-excel.sheet.binary.macroEnabled.12',
+    xlsm: 'application/vnd.ms-excel.sheet.macroEnabled.12',
+    xltx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+    xltm: 'application/vnd.ms-excel.template.macroEnabled.12',
+    xlam: 'application/vnd.ms-excel.addin.macroEnabled.12',
     pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     ppt: 'application/vnd.ms-powerpoint',
     mp4: 'video/mp4',

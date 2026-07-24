@@ -11,6 +11,7 @@ interface PreviewState {
   closeTab: (tabId: string) => void;
   setActiveTab: (tabId: string) => void;
   closeAllTabs: () => void;
+  setTabZoom: (tabId: string, zoom: number) => void;
 }
 
 export const usePreviewStore = create<PreviewState>((set, get) => ({
@@ -58,4 +59,9 @@ export const usePreviewStore = create<PreviewState>((set, get) => ({
   setActiveTab: (tabId) => set({ activeTabId: tabId }),
 
   closeAllTabs: () => set({ tabs: [], activeTabId: null }),
+
+  setTabZoom: (tabId, zoom) =>
+    set((s) => ({
+      tabs: s.tabs.map((t) => (t.id === tabId ? { ...t, zoom } : t)),
+    })),
 }));

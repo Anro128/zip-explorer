@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import type { VFSFile } from '../../core/vfs/types';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { getMonacoLanguage } from '../../utils/fileTypes';
+import { usePreviewStore } from '../../store/usePreviewStore';
 
 const MonacoEditor = React.lazy(() => import('@monaco-editor/react'));
 
@@ -12,6 +13,9 @@ interface CodeViewerProps {
 
 export function CodeViewer({ file, text }: CodeViewerProps) {
   const { theme, editorFontSize } = useSettingsStore();
+  const { tabs, activeTabId } = usePreviewStore();
+  const activeTab = tabs.find((t) => t.id === activeTabId);
+  const zoom = activeTab?.zoom ?? 1;
   const language = getMonacoLanguage(file.name);
 
   return (
@@ -82,7 +86,7 @@ export function CodeViewer({ file, text }: CodeViewerProps) {
             theme={theme === 'dark' ? 'vs-dark' : 'vs'}
             options={{
               readOnly: true,
-              fontSize: editorFontSize,
+              fontSize: editorFontSize * zoom,
               wordWrap: 'on',
               minimap: { enabled: true },
               lineNumbers: 'on',

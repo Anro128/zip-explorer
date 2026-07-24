@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Search, ChevronUp, ChevronDown } from 'lucide-react';
+import { HighlightText } from '../common/HighlightText';
 
 interface CsvViewerProps {
   text: string;
@@ -40,14 +41,13 @@ export function CsvViewer({ text }: CsvViewerProps) {
 
   const { headers, rows } = useMemo(() => parseCsv(text), [text]);
 
-  const filteredRows = useMemo(() => {
-    let r = rows;
-    if (filter.trim()) {
-      const q = filter.toLowerCase();
-      r = r.filter((row) => row.some((cell) => cell.toLowerCase().includes(q)));
-    }
+  const CHUNK_SIZE = 100;
+  const [visibleCount, setVisibleCount] = useState(CHUNK_SIZE);
+
+  const sortedRows = useMemo(() => {
+    let r = [...rows];
     if (sortCol !== null) {
-      r = [...r].sort((a, b) => {
+      r.sort((a, b) => {
         const av = a[sortCol] ?? '';
         const bv = b[sortCol] ?? '';
         const n1 = parseFloat(av), n2 = parseFloat(bv);
@@ -56,7 +56,62 @@ export function CsvViewer({ text }: CsvViewerProps) {
       });
     }
     return r;
-  }, [rows, filter, sortCol, sortDir]);
+  }, [rows, sortCol, sortDir]);
+
+  const [activeMatchIndex, setActiveMatchIndex] = useState(0);
+
+  const matchData = useMemo(() => {
+    if (!filter.trim()) return { total: 0, rowStarts: [] };
+    const regex = new RegExp(`(${filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    let total = 0;
+    const rowStarts = sortedRows.map(row => {
+      return row.map(cell => {
+        const start = total;
+        total += (cell.match(regex) || []).length;
+        return start;
+      });
+    });
+    return { total, rowStarts };
+  }, [sortedRows, filter]);
+
+  // Reset active match when filter changes
+  useEffect(() => {
+    setActiveMatchIndex(0);
+  }, [filter]);
+
+  // Auto-scroll to active match and smart expand
+  useEffect(() => {
+    if (matchData.total > 0) {
+      const targetRowIdx = matchData.rowStarts.findIndex((cellStarts, idx) => {
+        const rowStart = cellStarts[0] ?? matchData.total;
+        const nextRowStart = matchData.rowStarts[idx + 1]?.[0] ?? matchData.total;
+        return activeMatchIndex >= rowStart && activeMatchIndex < nextRowStart;
+      });
+
+      if (targetRowIdx !== -1 && targetRowIdx >= visibleCount) {
+        setVisibleCount(Math.min(targetRowIdx + 50, sortedRows.length));
+      } else {
+        const el = document.getElementById('active-search-match');
+        if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    }
+  }, [activeMatchIndex, matchData, visibleCount, sortedRows.length]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    if (scrollTop + clientHeight >= scrollHeight - 300) {
+      if (visibleCount < sortedRows.length) {
+        setVisibleCount(v => Math.min(v + CHUNK_SIZE, sortedRows.length));
+      }
+    }
+  };
+
+  const nextMatch = () => {
+    if (matchData.total > 0) setActiveMatchIndex(prev => (prev + 1) % matchData.total);
+  };
+  const prevMatch = () => {
+    if (matchData.total > 0) setActiveMatchIndex(prev => (prev - 1 + matchData.total) % matchData.total);
+  };
 
   const toggleSort = (colIdx: number) => {
     if (sortCol === colIdx) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -68,24 +123,46 @@ export function CsvViewer({ text }: CsvViewerProps) {
       {/* Toolbar */}
       <div style={{ padding: '6px 12px', borderBottom: '1px solid var(--border-muted)', display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-          {filteredRows.length}/{rows.length} rows · {headers.length} cols
+          {filter.trim() && matchData.total > 0 ? `${activeMatchIndex + 1} of ${matchData.total} matches · ` : filter.trim() ? `0 matches · ` : ''}{rows.length} rows · {headers.length} cols
         </span>
         <div style={{ flex: 1 }} />
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <Search size={11} style={{ position: 'absolute', left: 8, color: 'var(--text-muted)' }} />
           <input
             className="search-input"
-            style={{ paddingLeft: 26, width: 200 }}
-            placeholder="Filter rows..."
+            style={{ paddingLeft: 26, paddingRight: filter.trim() ? 50 : 8, width: 220 }}
+            placeholder="Search in CSV..."
             value={filter}
             onChange={e => setFilter(e.target.value)}
             id="csv-filter"
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                if (e.shiftKey) prevMatch();
+                else nextMatch();
+              }
+            }}
           />
+          {filter.trim() && matchData.total > 0 && (
+            <div style={{ position: 'absolute', right: 4, display: 'flex', gap: 2 }}>
+              <button 
+                onClick={prevMatch}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}
+              >
+                <ChevronUp size={14} />
+              </button>
+              <button 
+                onClick={nextMatch}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}
+              >
+                <ChevronDown size={14} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Table */}
-      <div className="csv-viewer">
+      <div className="csv-viewer" onScroll={handleScroll}>
         <table className="csv-table">
           <thead>
             <tr>
@@ -101,11 +178,11 @@ export function CsvViewer({ text }: CsvViewerProps) {
             </tr>
           </thead>
           <tbody>
-            {filteredRows.map((row, ri) => (
+            {sortedRows.slice(0, visibleCount).map((row, ri) => (
               <tr key={ri}>
                 <td style={{ color: 'var(--text-muted)', textAlign: 'right' }}>{ri + 1}</td>
                 {headers.map((_, ci) => (
-                  <td key={ci}>{row[ci] ?? ''}</td>
+                  <td key={ci}>{row[ci] ? <HighlightText text={row[ci]} query={filter} matchStartIndex={matchData.rowStarts[ri]?.[ci]} activeMatchIndex={activeMatchIndex} /> : ''}</td>
                 ))}
               </tr>
             ))}

@@ -23,5 +23,5 @@ export const BINARY_EXTENSIONS = new Set([
   'woff', 'woff2', 'ttf', 'otf', 'eot',
   'pyc', 'pyo',
   'pkl', 'pickle', 'npy', 'npz',
-  'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'
+  'doc', 'docx', 'xls', 'xlsx', 'xlsb', 'xlsm', 'xltx', 'xltm', 'xlam', 'ppt', 'pptx'
 ]);
