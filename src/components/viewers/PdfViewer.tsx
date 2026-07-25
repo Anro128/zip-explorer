@@ -34,6 +34,18 @@ function PdfPage({
   const observerRef = useRef<IntersectionObserver | null>(null);
   const hasRendered = useRef(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [pageSize, setPageSize] = useState<{ width: number; height: number } | null>(null);
+
+  // Fetch exact viewport size for accurate placeholder height (prevents page overlap & huge gaps)
+  useEffect(() => {
+    let active = true;
+    pdf.getPage(pageNum).then((page) => {
+      if (!active) return;
+      const viewport = page.getViewport({ scale });
+      setPageSize({ width: viewport.width, height: viewport.height });
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [pdf, pageNum, scale]);
 
   const renderPage = useCallback(async () => {
     const canvas = canvasRef.current;
@@ -51,7 +63,7 @@ function PdfPage({
       // Cancel any running task
       renderTaskRef.current?.cancel();
 
-      const task = page.render({ canvasContext: ctx, viewport, canvas: canvasRef.current! });
+      const task = page.render({ canvasContext: ctx, viewport, canvas });
       renderTaskRef.current = task;
       await task.promise;
       hasRendered.current = true;
@@ -76,13 +88,15 @@ function PdfPage({
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !hasRendered.current) {
-          hasRendered.current = true;
-          renderPage();
+        if (entries[0].isIntersecting) {
           onVisible?.(pageNum);
+          if (!hasRendered.current) {
+            hasRendered.current = true;
+            renderPage();
+          }
         }
       },
-      { threshold: 0.01 }
+      { threshold: 0.05 }
     );
     observerRef.current.observe(wrapper);
 
@@ -97,19 +111,22 @@ function PdfPage({
       ref={wrapperRef}
       id={`pdf-page-${pageNum}`}
       style={{
-        padding: '8px 0',
-        minHeight: `${800 * scale}px`,
-        textAlign: 'center',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 16,
+        minHeight: pageSize ? `${pageSize.height}px` : '300px',
+        width: '100%',
       }}
     >
       <canvas
         ref={canvasRef}
         style={{
           display: 'block',
-          margin: '0 auto',
           boxShadow: '0 2px 12px rgba(0,0,0,0.4)',
           borderRadius: 2,
           background: '#fff',
+          maxWidth: '100%',
         }}
       />
     </div>
