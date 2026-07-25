@@ -12,6 +12,8 @@ interface PreviewState {
   setActiveTab: (tabId: string) => void;
   closeAllTabs: () => void;
   setTabZoom: (tabId: string, zoom: number) => void;
+  moveTab: (fromIndex: number, toIndex: number) => void;
+  closeOtherTabs: (tabId: string) => void;
 }
 
 export const usePreviewStore = create<PreviewState>((set, get) => ({
@@ -64,4 +66,22 @@ export const usePreviewStore = create<PreviewState>((set, get) => ({
     set((s) => ({
       tabs: s.tabs.map((t) => (t.id === tabId ? { ...t, zoom } : t)),
     })),
+
+  moveTab: (fromIndex, toIndex) =>
+    set((s) => {
+      if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= s.tabs.length || toIndex >= s.tabs.length) {
+        return s;
+      }
+      const newTabs = [...s.tabs];
+      const [moved] = newTabs.splice(fromIndex, 1);
+      newTabs.splice(toIndex, 0, moved);
+      return { tabs: newTabs };
+    }),
+
+  closeOtherTabs: (tabId) =>
+    set((s) => {
+      const target = s.tabs.find((t) => t.id === tabId);
+      if (!target) return s;
+      return { tabs: [target], activeTabId: tabId };
+    }),
 }));
