@@ -50,9 +50,18 @@ export function SplitPanel() {
 
   // ── Global drag-and-drop ──────────────────────────────────────────────────
   useEffect(() => {
-    const onDragOver = (e: DragEvent) => { e.preventDefault(); setIsDroppingOnApp(true); };
+    const onDragOver = (e: DragEvent) => {
+      if (!e.dataTransfer?.types?.includes('Files') || e.dataTransfer?.types?.includes('application/zip-explorer-tab')) {
+        return;
+      }
+      e.preventDefault();
+      setIsDroppingOnApp(true);
+    };
     const onDragLeave = (e: DragEvent) => { if (e.clientX === 0 || e.clientY === 0) setIsDroppingOnApp(false); };
     const onDrop = async (e: DragEvent) => {
+      if (!e.dataTransfer?.types?.includes('Files') || e.dataTransfer?.types?.includes('application/zip-explorer-tab')) {
+        return;
+      }
       e.preventDefault();
       setIsDroppingOnApp(false);
       const files = e.dataTransfer?.files;
@@ -86,8 +95,6 @@ export function SplitPanel() {
         minHeight: 0,
         display: 'flex',
         overflow: 'hidden',
-        outline: isDroppingOnApp ? '2px dashed var(--accent-primary)' : undefined,
-        outlineOffset: -4,
       }}
     >
       {!hasZips ? (
@@ -138,6 +145,8 @@ export function SplitPanel() {
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
+              outline: isDroppingOnApp ? '2px dashed var(--accent-primary)' : undefined,
+              outlineOffset: -4,
             }}
           >
             <PreviewPanel />
