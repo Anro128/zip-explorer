@@ -896,8 +896,7 @@ code, pre, .font-mono {
   padding: 6px 12px;
   text-align: left;
   font-weight: 600;
-  border-bottom: 1px solid var(--border-default);
-  border-right: 1px solid var(--border-muted);
+  border: 1px solid var(--border-default);
   position: sticky;
   top: 0;
   white-space: nowrap;
@@ -905,12 +904,12 @@ code, pre, .font-mono {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  z-index: 2;
 }
 
 .csv-table td {
   padding: 4px 12px;
-  border-bottom: 1px solid var(--border-muted);
-  border-right: 1px solid var(--border-muted);
+  border: 1px solid var(--border-muted);
   white-space: nowrap;
   color: var(--text-primary);
 }

@@ -7,6 +7,16 @@ interface SpreadsheetViewerProps {
   bytes: Uint8Array;
 }
 
+function getExcelColName(n: number): string {
+  let name = '';
+  let col = n;
+  while (col >= 0) {
+    name = String.fromCharCode((col % 26) + 65) + name;
+    col = Math.floor(col / 26) - 1;
+  }
+  return name;
+}
+
 export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
   const [workbook, setWorkbook] = useState<XLSX.WorkBook | null>(null);
   const [activeSheet, setActiveSheet] = useState<string>('');
@@ -36,12 +46,14 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
     const json: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
     if (json.length === 0) return { headers: [], rows: [] };
     
-    const maxCols = Math.max(...json.map(r => r.length));
-    const rawHeaders = json[0] || [];
-    // Ensure headers array is long enough
-    const headers = Array.from({ length: maxCols }, (_, i) => String(rawHeaders[i] || `Col ${i + 1}`));
+    const maxCols = Math.max(...json.map(r => r.length), 0);
+    if (maxCols === 0) return { headers: [], rows: [] };
+
+    // Standard Excel Column Labels: A, B, C, D, ...
+    const headers = Array.from({ length: maxCols }, (_, i) => getExcelColName(i));
     
-    const rows = json.slice(1).map(r => {
+    // Keep ALL rows (including row 0) as data rows
+    const rows = json.map(r => {
       return Array.from({ length: maxCols }, (_, i) => String(r[i] ?? ''));
     });
     
@@ -136,17 +148,6 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Toolbar */}
       <div style={{ padding: '6px 12px', borderBottom: '1px solid var(--border-muted)', display: 'flex', gap: 12, alignItems: 'center', flexShrink: 0, overflowX: 'auto' }}>
-        {workbook.SheetNames.length > 1 && (
-          <select 
-            value={activeSheet} 
-            onChange={(e) => { setActiveSheet(e.target.value); setSortCol(null); setFilter(''); }}
-            style={{ padding: '2px 8px', borderRadius: 4, border: '1px solid var(--border-default)', background: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
-          >
-            {workbook.SheetNames.map(name => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
-        )}
         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
           {filter.trim() && matchData.total > 0 ? `${activeMatchIndex + 1} of ${matchData.total} matches · ` : filter.trim() ? `0 matches · ` : ''}{rows.length} rows · {headers.length} cols
         </span>
@@ -186,33 +187,91 @@ export function SpreadsheetViewer({ bytes }: SpreadsheetViewerProps) {
       </div>
 
       {/* Table */}
-      <div className="csv-viewer" onScroll={handleScroll}>
-        <table className="csv-table">
-          <thead>
-            <tr>
-              <th style={{ width: 40, color: 'var(--text-muted)', textAlign: 'right' }}>#</th>
-              {headers.map((h, i) => (
-                <th key={i} onClick={() => toggleSort(i)} style={{ cursor: 'pointer', userSelect: 'none' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    {h}
-                    {sortCol === i && <span>{sortDir === 'asc' ? '↑' : '↓'}</span>}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sortedRows.slice(0, visibleCount).map((row, ri) => (
-              <tr key={ri}>
-                <td style={{ color: 'var(--text-muted)', textAlign: 'right' }}>{ri + 1}</td>
-                {headers.map((_, ci) => (
-                  <td key={ci}>{row[ci] ? <HighlightText text={row[ci]} query={filter} matchStartIndex={matchData.rowStarts[ri]?.[ci]} activeMatchIndex={activeMatchIndex} /> : ''}</td>
+      <div className="csv-viewer" onScroll={handleScroll} style={{ flex: 1, minHeight: 0 }}>
+        {rows.length === 0 ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 13 }}>
+            No data in sheet "{activeSheet}"
+          </div>
+        ) : (
+          <table className="csv-table">
+            <thead>
+              <tr>
+                <th style={{ width: 40, color: 'var(--text-muted)', textAlign: 'right' }}>#</th>
+                {headers.map((h, i) => (
+                  <th key={i} onClick={() => toggleSort(i)} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      {h}
+                      {sortCol === i && <span>{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                    </span>
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sortedRows.slice(0, visibleCount).map((row, ri) => (
+                <tr key={ri}>
+                  <td style={{ color: 'var(--text-muted)', textAlign: 'right' }}>{ri + 1}</td>
+                  {headers.map((_, ci) => (
+                    <td key={ci}>{row[ci] ? <HighlightText text={row[ci]} query={filter} matchStartIndex={matchData.rowStarts[ri]?.[ci]} activeMatchIndex={activeMatchIndex} /> : ''}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      {/* ── Bottom Excel Sheet Tabs Bar ── */}
+      {workbook.SheetNames.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            padding: '4px 8px 0 8px',
+            background: 'var(--bg-secondary)',
+            borderTop: '1px solid var(--border-muted)',
+            overflowX: 'auto',
+            flexShrink: 0,
+          }}
+          className="hide-scrollbar"
+        >
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 6, fontWeight: 600, flexShrink: 0, letterSpacing: '0.05em' }}>
+            SHEETS ({workbook.SheetNames.length}):
+          </div>
+          {workbook.SheetNames.map((name) => {
+            const isActive = activeSheet === name;
+            return (
+              <button
+                key={name}
+                onClick={() => {
+                  setActiveSheet(name);
+                  setSortCol(null);
+                  setFilter('');
+                  setVisibleCount(CHUNK_SIZE);
+                }}
+                style={{
+                  padding: '4px 12px',
+                  borderTopLeftRadius: 4,
+                  borderTopRightRadius: 4,
+                  border: '1px solid',
+                  borderColor: isActive ? 'var(--border-default)' : 'transparent',
+                  borderBottom: isActive ? '2px solid var(--accent-primary)' : '1px solid transparent',
+                  background: isActive ? 'var(--bg-primary)' : 'transparent',
+                  color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                  fontWeight: isActive ? 600 : 400,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  fontSize: 11,
+                  transition: 'all 0.12s ease',
+                }}
+              >
+                {name}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
