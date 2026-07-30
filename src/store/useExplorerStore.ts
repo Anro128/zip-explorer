@@ -33,6 +33,9 @@ interface ExplorerState {
   // Password prompts
   pendingPasswordFor: { zipId: string; name: string; resolve: (pw: string | null) => void } | null;
 
+  // Sidebar
+  isSidebarVisible: boolean;
+
   // Actions
   addRootZip: (rz: RootZip) => void;
   removeRootZip: (zipId: string) => void;
@@ -50,6 +53,7 @@ interface ExplorerState {
   setBreadcrumbs: (crumbs: BreadcrumbItem[]) => void;
   setCurrentPath: (path: string) => void;
   setPendingPassword: (v: ExplorerState['pendingPasswordFor']) => void;
+  toggleSidebar: () => void;
 }
 
 export const useExplorerStore = create<ExplorerState>((set, _get) => ({
@@ -64,6 +68,7 @@ export const useExplorerStore = create<ExplorerState>((set, _get) => ({
   isSearching: false,
   loadingPaths: new Set(),
   pendingPasswordFor: null,
+  isSidebarVisible: true,
 
   addRootZip: (rz) =>
     set((s) => ({ rootZips: [...s.rootZips, rz] })),
@@ -146,4 +151,5 @@ export const useExplorerStore = create<ExplorerState>((set, _get) => ({
   setBreadcrumbs: (crumbs) => set({ breadcrumbs: crumbs }),
   setCurrentPath: (path) => set({ currentPath: path }),
   setPendingPassword: (v) => set({ pendingPasswordFor: v }),
+  toggleSidebar: () => set((s) => ({ isSidebarVisible: !s.isSidebarVisible })),
 }));

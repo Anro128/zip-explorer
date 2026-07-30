@@ -3,31 +3,50 @@ import type { VFSFile, OpenTab } from '../core/vfs/types';
 
 let tabCounter = 0;
 
-interface PreviewState {
+export interface PaneState {
   tabs: OpenTab[];
   activeTabId: string | null;
+}
+
+export interface PreviewState {
+  primary: PaneState;
+  secondary: PaneState | null;
+  activePane: 'primary' | 'secondary';
 
   openFile: (file: VFSFile) => void;
-  closeTab: (tabId: string) => void;
-  setActiveTab: (tabId: string) => void;
-  closeAllTabs: () => void;
-  setTabZoom: (tabId: string, zoom: number) => void;
-  moveTab: (fromIndex: number, toIndex: number) => void;
-  closeOtherTabs: (tabId: string) => void;
+  closeTab: (paneId: 'primary' | 'secondary', tabId: string) => void;
+  setActiveTab: (paneId: 'primary' | 'secondary', tabId: string) => void;
+  closeAllTabs: (paneId: 'primary' | 'secondary') => void;
+  setTabZoom: (paneId: 'primary' | 'secondary', tabId: string, zoom: number) => void;
+  moveTab: (paneId: 'primary' | 'secondary', fromIndex: number, toIndex: number) => void;
+  closeOtherTabs: (paneId: 'primary' | 'secondary', tabId: string) => void;
+  
+  setActivePane: (paneId: 'primary' | 'secondary') => void;
+  toggleSplit: () => void;
 }
 
 export const usePreviewStore = create<PreviewState>((set, get) => ({
-  tabs: [],
-  activeTabId: null,
+  primary: { tabs: [], activeTabId: null },
+  secondary: null,
+  activePane: 'primary',
 
   openFile: (file) => {
-    const existing = get().tabs.find(
+    const state = get();
+    const paneId = state.activePane;
+    const pane = state[paneId];
+    if (!pane) return;
+
+    const existing = pane.tabs.find(
       (t) => t.file.path === file.path && t.file.zipId === file.zipId
     );
+
     if (existing) {
-      set({ activeTabId: existing.id });
+      set({
+        [paneId]: { ...pane, activeTabId: existing.id }
+      } as Partial<PreviewState>);
       return;
     }
+
     const id = `tab_${++tabCounter}`;
     const tab: OpenTab = {
       id,
@@ -35,19 +54,26 @@ export const usePreviewStore = create<PreviewState>((set, get) => ({
       label: file.name,
       isPinned: false,
     };
-    set((s) => ({
-      tabs: [...s.tabs, tab],
-      activeTabId: id,
-    }));
+
+    set({
+      [paneId]: {
+        ...pane,
+        tabs: [...pane.tabs, tab],
+        activeTabId: id,
+      }
+    } as Partial<PreviewState>);
   },
 
-  closeTab: (tabId) =>
+  closeTab: (paneId, tabId) =>
     set((s) => {
-      const idx = s.tabs.findIndex((t) => t.id === tabId);
-      const newTabs = s.tabs.filter((t) => t.id !== tabId);
-      let newActiveId = s.activeTabId;
-      if (s.activeTabId === tabId) {
-        // Activate adjacent tab
+      const pane = s[paneId];
+      if (!pane) return s;
+
+      const idx = pane.tabs.findIndex((t) => t.id === tabId);
+      const newTabs = pane.tabs.filter((t) => t.id !== tabId);
+      let newActiveId = pane.activeTabId;
+
+      if (pane.activeTabId === tabId) {
         if (newTabs.length > 0) {
           const newIdx = Math.min(idx, newTabs.length - 1);
           newActiveId = newTabs[newIdx].id;
@@ -55,33 +81,72 @@ export const usePreviewStore = create<PreviewState>((set, get) => ({
           newActiveId = null;
         }
       }
-      return { tabs: newTabs, activeTabId: newActiveId };
+
+      return {
+        [paneId]: { ...pane, tabs: newTabs, activeTabId: newActiveId }
+      } as Partial<PreviewState>;
     }),
 
-  setActiveTab: (tabId) => set({ activeTabId: tabId }),
-
-  closeAllTabs: () => set({ tabs: [], activeTabId: null }),
-
-  setTabZoom: (tabId, zoom) =>
-    set((s) => ({
-      tabs: s.tabs.map((t) => (t.id === tabId ? { ...t, zoom } : t)),
-    })),
-
-  moveTab: (fromIndex, toIndex) =>
+  setActiveTab: (paneId, tabId) => 
     set((s) => {
-      if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= s.tabs.length || toIndex >= s.tabs.length) {
+      const pane = s[paneId];
+      if (!pane) return s;
+      return { [paneId]: { ...pane, activeTabId: tabId } } as Partial<PreviewState>;
+    }),
+
+  closeAllTabs: (paneId) => 
+    set((s) => {
+      if (!s[paneId]) return s;
+      return { [paneId]: { tabs: [], activeTabId: null } } as Partial<PreviewState>;
+    }),
+
+  setTabZoom: (paneId, tabId, zoom) =>
+    set((s) => {
+      const pane = s[paneId];
+      if (!pane) return s;
+      return {
+        [paneId]: {
+          ...pane,
+          tabs: pane.tabs.map((t) => (t.id === tabId ? { ...t, zoom } : t)),
+        }
+      } as Partial<PreviewState>;
+    }),
+
+  moveTab: (paneId, fromIndex, toIndex) =>
+    set((s) => {
+      const pane = s[paneId];
+      if (!pane) return s;
+      if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= pane.tabs.length || toIndex >= pane.tabs.length) {
         return s;
       }
-      const newTabs = [...s.tabs];
+      const newTabs = [...pane.tabs];
       const [moved] = newTabs.splice(fromIndex, 1);
       newTabs.splice(toIndex, 0, moved);
-      return { tabs: newTabs };
+      return { [paneId]: { ...pane, tabs: newTabs } } as Partial<PreviewState>;
     }),
 
-  closeOtherTabs: (tabId) =>
+  closeOtherTabs: (paneId, tabId) =>
     set((s) => {
-      const target = s.tabs.find((t) => t.id === tabId);
+      const pane = s[paneId];
+      if (!pane) return s;
+      const target = pane.tabs.find((t) => t.id === tabId);
       if (!target) return s;
-      return { tabs: [target], activeTabId: tabId };
+      return { [paneId]: { ...pane, tabs: [target], activeTabId: tabId } } as Partial<PreviewState>;
     }),
+
+  setActivePane: (paneId) => set({ activePane: paneId }),
+
+  toggleSplit: () => set((s) => {
+    if (s.secondary) {
+      return {
+        secondary: null,
+        activePane: 'primary'
+      };
+    } else {
+      return {
+        secondary: { tabs: [], activeTabId: null },
+        activePane: 'secondary'
+      };
+    }
+  }),
 }));

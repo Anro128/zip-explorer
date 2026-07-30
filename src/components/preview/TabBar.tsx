@@ -4,8 +4,18 @@ import { usePreviewStore } from '../../store/usePreviewStore';
 import { FileIcon } from '../explorer/FileIcon';
 import type { OpenTab } from '../../core/vfs/types';
 
-export function TabBar() {
-  const { tabs, activeTabId, closeTab, setActiveTab, closeAllTabs, moveTab, closeOtherTabs } = usePreviewStore();
+interface TabBarProps {
+  paneId: 'primary' | 'secondary';
+}
+
+export function TabBar({ paneId }: TabBarProps) {
+  const store = usePreviewStore();
+  const pane = store[paneId];
+  if (!pane) return null;
+
+  const { tabs, activeTabId } = pane;
+  const { closeTab, setActiveTab, closeAllTabs, moveTab, closeOtherTabs } = store;
+
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; tabId: string; index: number } | null>(null);
@@ -66,7 +76,7 @@ export function TabBar() {
   };
 
   return (
-    <div className="tab-bar" id="tab-bar" role="tablist" style={{ overflow: 'hidden', padding: '0 6px', position: 'relative' }}>
+    <div className="tab-bar" id={`tab-bar-${paneId}`} role="tablist" style={{ overflow: 'hidden', padding: '0 6px', position: 'relative' }}>
       <div
         ref={scrollContainerRef}
         style={{ flex: 1, display: 'flex', overflowX: 'auto', overflowY: 'hidden', height: '100%' }}
@@ -77,7 +87,7 @@ export function TabBar() {
           e.preventDefault();
           stopAutoScroll();
           if (draggedIndex !== null && dragOverIndex === null) {
-            moveTab(draggedIndex, tabs.length - 1);
+            moveTab(paneId, draggedIndex, tabs.length - 1);
           }
           setDraggedIndex(null);
           setDragOverIndex(null);
@@ -101,14 +111,14 @@ export function TabBar() {
                 transition: 'opacity 0.15s, box-shadow 0.1s',
                 userSelect: 'none',
               }}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => setActiveTab(paneId, tab.id)}
               onContextMenu={(e) => {
                 e.preventDefault();
                 setContextMenu({ x: e.clientX, y: e.clientY, tabId: tab.id, index });
               }}
               role="tab"
               aria-selected={activeTabId === tab.id}
-              id={`tab-${tab.id}`}
+              id={`tab-${paneId}-${tab.id}`}
               title={tab.file.path}
               draggable
               onDragStart={(e) => {
@@ -133,7 +143,7 @@ export function TabBar() {
                 e.stopPropagation();
                 stopAutoScroll();
                 if (draggedIndex !== null && draggedIndex !== index) {
-                  moveTab(draggedIndex, index);
+                  moveTab(paneId, draggedIndex, index);
                 }
                 setDraggedIndex(null);
                 setDragOverIndex(null);
@@ -150,7 +160,7 @@ export function TabBar() {
                 className="tab-close"
                 onClick={(e) => {
                   e.stopPropagation();
-                  closeTab(tab.id);
+                  closeTab(paneId, tab.id);
                 }}
                 title="Close tab"
                 aria-label={`Close ${tab.label}`}
@@ -165,7 +175,7 @@ export function TabBar() {
       {tabs.length > 1 && (
         <button
           className="btn btn-ghost btn-icon"
-          onClick={closeAllTabs}
+          onClick={() => closeAllTabs(paneId)}
           title="Close All Tabs"
           style={{ flexShrink: 0, marginLeft: 4, width: 26, height: 26 }}
         >
@@ -197,7 +207,7 @@ export function TabBar() {
             onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-hover)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
             onClick={() => {
-              moveTab(contextMenu.index, 0);
+              moveTab(paneId, contextMenu.index, 0);
               setContextMenu(null);
             }}
           >
@@ -208,7 +218,7 @@ export function TabBar() {
             onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-hover)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
             onClick={() => {
-              moveTab(contextMenu.index, tabs.length - 1);
+              moveTab(paneId, contextMenu.index, tabs.length - 1);
               setContextMenu(null);
             }}
           >
@@ -220,7 +230,7 @@ export function TabBar() {
             onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-hover)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
             onClick={() => {
-              closeOtherTabs(contextMenu.tabId);
+              closeOtherTabs(paneId, contextMenu.tabId);
               setContextMenu(null);
             }}
           >
@@ -231,7 +241,7 @@ export function TabBar() {
             onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-hover)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
             onClick={() => {
-              closeTab(contextMenu.tabId);
+              closeTab(paneId, contextMenu.tabId);
               setContextMenu(null);
             }}
           >

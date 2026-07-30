@@ -1,36 +1,74 @@
+import { useState } from 'react';
 import { TabBar } from './TabBar';
 import { ViewerRouter } from './ViewerRouter';
 import { usePreviewStore } from '../../store/usePreviewStore';
 import { SUPPORTED_VIEWERS_TEXT } from '../../utils/constants';
-import { FolderOpen, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { FolderOpen, ZoomIn, ZoomOut, RotateCcw, Columns, X, Download } from 'lucide-react';
+import { readFileBytes } from '../../core/vfs/ZipVFS';
 
-export function PreviewPanel() {
-  const { tabs, activeTabId, setTabZoom } = usePreviewStore();
-  const activeTab = tabs.find((t) => t.id === activeTabId);
+interface PreviewPanelProps {
+  paneId: 'primary' | 'secondary';
+}
+
+export function PreviewPanel({ paneId }: PreviewPanelProps) {
+  const store = usePreviewStore();
+  const pane = store[paneId];
+  if (!pane) return null;
   
+  const { tabs, activeTabId } = pane;
+  const { setTabZoom, toggleSplit, secondary, setActivePane, activePane } = store;
+  const [isDownloading, setIsDownloading] = useState(false);
+  
+  const activeTab = tabs.find((t) => t.id === activeTabId);
+  const isActivePane = activePane === paneId;
+  
+  const handleDownload = async () => {
+    if (!activeTab || isDownloading) return;
+    setIsDownloading(true);
+    try {
+      const bytes = await readFileBytes(activeTab.file.zipId, activeTab.file.entryPath);
+      const blob = new Blob([bytes as unknown as BlobPart], { type: activeTab.file.mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = activeTab.file.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to download file', err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const handleZoomIn = () => {
     if (!activeTab) return;
     const currentZoom = activeTab.zoom ?? 1;
-    setTabZoom(activeTab.id, Math.min(currentZoom + 0.25, 4));
+    setTabZoom(paneId, activeTab.id, Math.min(currentZoom + 0.25, 4));
   };
 
   const handleZoomOut = () => {
     if (!activeTab) return;
     const currentZoom = activeTab.zoom ?? 1;
-    setTabZoom(activeTab.id, Math.max(currentZoom - 0.25, 0.25));
+    setTabZoom(paneId, activeTab.id, Math.max(currentZoom - 0.25, 0.25));
   };
 
   const handleZoomReset = () => {
     if (!activeTab) return;
-    setTabZoom(activeTab.id, 1);
+    setTabZoom(paneId, activeTab.id, 1);
   };
 
   const zoomPercent = Math.round((activeTab?.zoom ?? 1) * 100);
 
   return (
     <div
-      className="preview-panel"
-      id="preview-panel"
+      className={`preview-panel ${isActivePane ? 'active-pane' : ''}`}
+      id={`preview-panel-${paneId}`}
+      onMouseDownCapture={() => {
+        if (!isActivePane) setActivePane(paneId);
+      }}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -39,9 +77,11 @@ export function PreviewPanel() {
         minHeight: 0,
         minWidth: 0,
         overflow: 'hidden',
+        border: isActivePane && secondary ? '1px solid var(--accent-primary)' : '1px solid transparent',
+        transition: 'border 0.2s',
       }}
     >
-      <TabBar />
+      <TabBar paneId={paneId} />
 
       {/* File path indicator */}
       {activeTab && (
@@ -67,6 +107,11 @@ export function PreviewPanel() {
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <button className="btn btn-ghost btn-icon" onClick={handleDownload} disabled={isDownloading} title="Download File" style={{ width: 22, height: 22 }}>
+              <Download size={12} style={{ opacity: isDownloading ? 0.5 : 1 }} />
+            </button>
+            <div style={{ width: 1, height: 12, background: 'var(--border-default)', margin: '0 4px' }} />
+            
             <button className="btn btn-ghost btn-icon" onClick={handleZoomOut} title="Zoom Out" style={{ width: 22, height: 22 }}>
               <ZoomOut size={12} />
             </button>
@@ -79,6 +124,18 @@ export function PreviewPanel() {
             <button className="btn btn-ghost btn-icon" onClick={handleZoomReset} title="Reset Zoom" style={{ width: 22, height: 22 }}>
               <RotateCcw size={12} />
             </button>
+            <div style={{ width: 1, height: 12, background: 'var(--border-default)', margin: '0 4px' }} />
+            
+            {paneId === 'primary' && !secondary && (
+              <button className="btn btn-ghost btn-icon" onClick={toggleSplit} title="Split Right" style={{ width: 22, height: 22 }}>
+                <Columns size={12} />
+              </button>
+            )}
+            {paneId === 'secondary' && (
+              <button className="btn btn-ghost btn-icon" onClick={toggleSplit} title="Close Split" style={{ width: 22, height: 22 }}>
+                <X size={12} />
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -108,6 +165,15 @@ export function PreviewPanel() {
             <div style={{ color: 'var(--text-muted)', fontSize: 12, opacity: 0.7 }}>
               {SUPPORTED_VIEWERS_TEXT}
             </div>
+            {paneId === 'primary' && !secondary && (
+              <button 
+                className="btn btn-secondary" 
+                style={{ marginTop: 16 }}
+                onClick={toggleSplit}
+              >
+                <Columns size={14} style={{ marginRight: 6 }} /> Split View
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ 

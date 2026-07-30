@@ -4,13 +4,15 @@ import { PreviewPanel } from '../preview/PreviewPanel';
 import { DropZone } from '../explorer/DropZone';
 import { useExplorerStore } from '../../store/useExplorerStore';
 import { useZipLoader } from '../../hooks/useZipLoader';
+import { usePreviewStore } from '../../store/usePreviewStore';
 
 const MIN_SIDEBAR = 200;   // px
 const MAX_SIDEBAR = 600;   // px
 const DEFAULT_SIDEBAR = 280; // px
 
 export function SplitPanel() {
-  const { rootZips } = useExplorerStore();
+  const { rootZips, isSidebarVisible } = useExplorerStore();
+  const { secondary } = usePreviewStore();
   const { loadRootZip } = useZipLoader();
   const [isDroppingOnApp, setIsDroppingOnApp] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR);
@@ -102,39 +104,43 @@ export function SplitPanel() {
       ) : (
         <>
           {/* ── Sidebar ── */}
-          <div
-            id="explorer-panel"
-            style={{
-              width: sidebarWidth,
-              minWidth: sidebarWidth,
-              maxWidth: sidebarWidth,
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              background: 'var(--bg-secondary)',
-              borderRight: '1px solid var(--border-default)',
-              flexShrink: 0,
-            }}
-          >
-            <FileTree />
-          </div>
+          {isSidebarVisible && (
+            <>
+              <div
+                id="explorer-panel"
+                style={{
+                  width: sidebarWidth,
+                  minWidth: sidebarWidth,
+                  maxWidth: sidebarWidth,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden',
+                  background: 'var(--bg-secondary)',
+                  borderRight: '1px solid var(--border-default)',
+                  flexShrink: 0,
+                }}
+              >
+                <FileTree />
+              </div>
 
-          {/* ── Drag Handle ── */}
-          <div
-            onMouseDown={onMouseDown}
-            style={{
-              width: 4,
-              flexShrink: 0,
-              cursor: 'col-resize',
-              background: 'var(--border-default)',
-              transition: 'background 120ms',
-              zIndex: 10,
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-primary)')}
-            onMouseLeave={e => {
-              if (!isDragging.current) e.currentTarget.style.background = 'var(--border-default)';
-            }}
-          />
+              {/* ── Drag Handle ── */}
+              <div
+                onMouseDown={onMouseDown}
+                style={{
+                  width: 4,
+                  flexShrink: 0,
+                  cursor: 'col-resize',
+                  background: 'var(--border-default)',
+                  transition: 'background 120ms',
+                  zIndex: 10,
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-primary)')}
+                onMouseLeave={e => {
+                  if (!isDragging.current) e.currentTarget.style.background = 'var(--border-default)';
+                }}
+              />
+            </>
+          )}
 
           {/* ── Preview ── */}
           <div
@@ -143,13 +149,23 @@ export function SplitPanel() {
               flex: 1,
               minWidth: 0,
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'row',
               overflow: 'hidden',
               outline: isDroppingOnApp ? '2px dashed var(--accent-primary)' : undefined,
               outlineOffset: -4,
             }}
           >
-            <PreviewPanel />
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+              <PreviewPanel paneId="primary" />
+            </div>
+            {secondary && (
+              <>
+                <div style={{ width: 1, background: 'var(--border-default)', flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                  <PreviewPanel paneId="secondary" />
+                </div>
+              </>
+            )}
           </div>
         </>
       )}

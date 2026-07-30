@@ -1,7 +1,8 @@
-import { Sun, Moon, Upload, Keyboard, Search, Archive } from 'lucide-react';
+import { Sun, Moon, Upload, Keyboard, Search, Archive, PanelLeft } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useZipLoader } from '../../hooks/useZipLoader';
 import { APP_NAME } from '../../utils/constants';
+import { useExplorerStore } from '../../store/useExplorerStore';
 
 interface HeaderProps {
   onQuickOpen: () => void;
@@ -12,6 +13,7 @@ interface HeaderProps {
 export function Header({ onQuickOpen, onShowShortcuts }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
   const { loadRootZip } = useZipLoader();
+  const { isSidebarVisible, toggleSidebar } = useExplorerStore();
 
   const openZip = () => {
     const input = document.createElement('input');
@@ -77,6 +79,15 @@ export function Header({ onQuickOpen, onShowShortcuts }: HeaderProps) {
 
       {/* Actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+        <button
+          className="btn btn-ghost btn-icon tooltip"
+          onClick={toggleSidebar}
+          data-tooltip={isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+          id="sidebar-toggle-btn"
+        >
+          <PanelLeft size={15} />
+        </button>
+
         <button
           className="btn btn-secondary"
           onClick={openZip}
