@@ -14,17 +14,17 @@ import { ShortcutsDialog } from '../dialogs/ShortcutsDialog';
 // Status bar
 function StatusBar() {
   const { rootZips, searchQuery, searchResults } = useExplorerStore();
-  const { tabs } = usePreviewStore();
-
+  const { primary, secondary } = usePreviewStore();
+  const tabsCount = primary.tabs.length + (secondary ? secondary.tabs.length : 0);
   
   return (
     <div className="status-bar" id="status-bar">
       <span className="status-item flex items-center gap-1">
         <Archive size={12} /> {rootZips.length} ZIP{rootZips.length !== 1 ? 's' : ''} loaded
       </span>
-      {tabs.length > 0 && (
+      {tabsCount > 0 && (
         <span className="status-item flex items-center gap-1">
-          <FolderOpen size={12} /> {tabs.length} tab{tabs.length !== 1 ? 's' : ''} open
+          <FolderOpen size={12} /> {tabsCount} tab{tabsCount !== 1 ? 's' : ''} open
         </span>
       )}
       {searchQuery && (
@@ -44,7 +44,10 @@ export function AppLayout() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   useTheme(); // Apply theme to document
 
-    const { closeTab, activeTabId } = usePreviewStore();
+  const store = usePreviewStore();
+  const { closeTab, activePane } = store;
+  const activePaneState = store[activePane];
+  const activeTabId = activePaneState?.activeTabId;
 
   const handlers = {
     onQuickOpen: useCallback(() => setShowQuickOpen(true), []),
@@ -54,8 +57,8 @@ export function AppLayout() {
     }, []),
     onGlobalSearch: useCallback(() => setShowQuickOpen(true), []),
     onCloseTab: useCallback(() => {
-      if (activeTabId) closeTab(activeTabId);
-    }, [activeTabId, closeTab]),
+      if (activeTabId) closeTab(activePane, activeTabId);
+    }, [activeTabId, closeTab, activePane]),
     onEscape: useCallback(() => {
       setShowQuickOpen(false);
       setShowShortcuts(false);

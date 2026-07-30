@@ -15,6 +15,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 interface PdfViewerProps {
   file: VFSFile;
   blobUrl: string;
+  paneId: 'primary' | 'secondary';
 }
 
 // ── Single page canvas component with lazy render via IntersectionObserver ──
@@ -133,13 +134,13 @@ function PdfPage({
   );
 }
 
-export function PdfViewer({ file, blobUrl }: PdfViewerProps) {
+export function PdfViewer({ file, blobUrl, paneId }: PdfViewerProps) {
   const [pdf, setPdf] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageInput, setPageInput] = useState('1');
-  const { tabs, activeTabId } = usePreviewStore();
-  const activeTab = tabs.find((t) => t.id === activeTabId);
+  const pane = usePreviewStore((s) => s[paneId]);
+  const activeTab = pane?.tabs.find((t) => t.id === pane?.activeTabId);
   const scale = activeTab?.zoom ?? PDF_INITIAL_SCALE;
   const [loadError, setLoadError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
