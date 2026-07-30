@@ -9,12 +9,13 @@ const MonacoEditor = React.lazy(() => import('@monaco-editor/react'));
 interface CodeViewerProps {
   file: VFSFile;
   text: string;
+  paneId: 'primary' | 'secondary';
 }
 
-export function CodeViewer({ file, text }: CodeViewerProps) {
+export function CodeViewer({ file, text, paneId }: CodeViewerProps) {
   const { theme, editorFontSize } = useSettingsStore();
-  const { tabs, activeTabId } = usePreviewStore();
-  const activeTab = tabs.find((t) => t.id === activeTabId);
+  const pane = usePreviewStore((s) => s[paneId]);
+  const activeTab = pane?.tabs.find((t) => t.id === pane?.activeTabId);
   const zoom = activeTab?.zoom ?? 1;
   const language = getMonacoLanguage(file.name);
 

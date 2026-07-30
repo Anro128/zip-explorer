@@ -180,7 +180,7 @@ export function PreviewPanel({ paneId }: PreviewPanelProps) {
             flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden',
             '--viewer-zoom': activeTab.zoom ?? 1 
           } as React.CSSProperties}>
-            <ViewerRouter key={activeTab.id} file={activeTab.file} />
+            <ViewerRouter key={activeTab.id} file={activeTab.file} paneId={paneId} />
           </div>
         )}
       </div>

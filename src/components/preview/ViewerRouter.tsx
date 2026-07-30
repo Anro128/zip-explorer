@@ -20,9 +20,10 @@ import { PptxViewer } from '../viewers/PptxViewer';
 
 interface ViewerRouterProps {
   file: VFSFile;
+  paneId: 'primary' | 'secondary';
 }
 
-export function ViewerRouter({ file }: ViewerRouterProps) {
+export function ViewerRouter({ file, paneId }: ViewerRouterProps) {
   const { text, bytes, blobUrl, isLoading, error } = useFileContent(file);
 
   if (isLoading) {
@@ -51,7 +52,7 @@ export function ViewerRouter({ file }: ViewerRouterProps) {
   const content = (() => {
     switch (fileType) {
       case 'pdf':
-        return blobUrl ? <PdfViewer file={file} blobUrl={blobUrl} /> : null;
+        return blobUrl ? <PdfViewer file={file} blobUrl={blobUrl} paneId={paneId} /> : null;
       case 'docx':
         return bytes ? <DocxViewer file={file} bytes={bytes} /> : null;
       case 'spreadsheet':
@@ -62,7 +63,7 @@ export function ViewerRouter({ file }: ViewerRouterProps) {
         return bytes ? <PptxViewer bytes={bytes} /> : null;
       case 'python':
       case 'code':
-        return text !== null ? <CodeViewer file={file} text={text} /> : null;
+        return text !== null ? <CodeViewer file={file} text={text} paneId={paneId} /> : null;
       case 'notebook':
         return text !== null ? <NotebookViewer text={text} /> : null;
       case 'markdown':
